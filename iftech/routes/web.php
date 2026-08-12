@@ -6,7 +6,3 @@ Route::get('/', function () {
     return view('HomeUsuario');
 });
 
-Route::get('/', function () {
-    return view('HomeUsuario');
-});
-
