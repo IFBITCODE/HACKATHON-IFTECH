@@ -50,49 +50,103 @@ document.addEventListener("DOMContentLoaded", function () {
     const registerForm = document.getElementById("entrepreneurForm");
     const statusAlert = document.getElementById("statusAlert");
 
-    if (registerForm) {
-        registerForm.addEventListener("submit", function (event) {
-            event.preventDefault();
+   if (registerForm) {
+    registerForm.addEventListener("submit", async function (event) {
+        event.preventDefault();
 
-            const password = document.getElementById("password");
-            const passwordConfirm = document.getElementById("password_confirmation");
+        const password = document.getElementById("password");
+        const passwordConfirm = document.getElementById("password_confirmation");
 
-            // Validação simples de confirmação de senha
-            if (password && passwordConfirm) {
-                if (password.value !== passwordConfirm.value) {
-                    passwordConfirm.setCustomValidity("As senhas não coincidem.");
-                } else {
-                    passwordConfirm.setCustomValidity("");
-                }
-            }
+        if (password.value !== passwordConfirm.value) {
+            passwordConfirm.setCustomValidity("As senhas não coincidem.");
+        } else {
+            passwordConfirm.setCustomValidity("");
+        }
 
-            if (!registerForm.checkValidity()) {
-                registerForm.classList.add("was-validated");
-                return;
-            }
+        if (!registerForm.checkValidity()) {
+            registerForm.classList.add("was-validated");
+            return;
+        }
 
-            // Exibe mensagem de sucesso se o form estiver válido
+        try {
+            const resUser = await fetch("/api/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "Accept": "application/json" },
+                body: JSON.stringify({
+                    name: document.getElementById("businessName").value,
+                    email: document.getElementById("email").value,
+                    password: password.value,
+                    password_confirmation: passwordConfirm.value,
+                    role: "empreendedor",
+                }),
+            });
+
+            const userData = await resUser.json();
+            if (!resUser.ok) throw new Error(userData.message || "Erro ao criar conta");
+
+            const resEmpreendedor = await fetch("/api/empreendedores", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "Accept": "application/json" },
+                body: JSON.stringify({
+                    user_id: userData.user.id,
+                    nome_fantasia: document.getElementById("businessName").value,
+                    cpf_cnpj: document.getElementById("document").value,
+                    descricao: document.getElementById("description").value,
+                    endereco: document.getElementById("address").value,
+                    bairro: document.getElementById("neighborhood").value,
+                    acessivel: document.getElementById("acc_rampa").checked,
+                    recursos_acessibilidade: [
+                        document.getElementById("acc_rampa").checked ? "Rampa" : null,
+                        document.getElementById("acc_libras").checked ? "Libras" : null,
+                        document.getElementById("acc_banheiro").checked ? "Banheiro adaptado" : null,
+                    ].filter(Boolean).join(", "),
+                }),
+            });
+
+            const empreendedorData = await resEmpreendedor.json();
+            if (!resEmpreendedor.ok) throw new Error(empreendedorData.message || "Erro ao cadastrar negócio");
+
             registerForm.style.display = "none";
-            if (statusAlert) {
-                statusAlert.classList.remove("d-none");
-            }
-
+            statusAlert.classList.remove("d-none");
             window.scrollTo({ top: 0, behavior: "smooth" });
-        });
-    }
+
+        } catch (err) {
+            alert("Erro: " + err.message);
+        }
+    });
+}
 
     // --- ENVIO DO FORMULÁRIO DE LOGIN ---
     const loginForm = document.getElementById("loginForm");
     if (loginForm) {
-        loginForm.addEventListener("submit", function (event) {
-            event.preventDefault();
+    loginForm.addEventListener("submit", async function (event) {
+        event.preventDefault();
 
-            if (!loginForm.checkValidity()) {
-                loginForm.classList.add("was-validated");
-                return;
-            }
+        if (!loginForm.checkValidity()) {
+            loginForm.classList.add("was-validated");
+            return;
+        }
 
-            alert("Login efetuado com sucesso (Simulação)!");
-        });
-    }
+        try {
+            const res = await fetch("/api/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "Accept": "application/json" },
+                body: JSON.stringify({
+                    email: document.getElementById("login_email").value,
+                    password: document.getElementById("login_password").value,
+                }),
+            });
+
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message || "Erro ao entrar");
+
+            localStorage.setItem("auth_token", data.token);
+            alert("Login realizado com sucesso!");
+
+        } catch (err) {
+            alert("Erro: " + err.message);
+        }
+    });
+}
+
 });
