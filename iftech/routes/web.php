@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ChatbotController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\OccurrenceController;
 
 
 //rota da pagina principal do usuario/turista 
@@ -34,4 +36,12 @@ Route::post('/chat', [ChatbotController::class, 'responder']);
 
 Route::get('/diagnostico', [ChatbotController::class, 'diagnostico']);
 
-Route::get('/diagnostico', [ChatbotController::class, 'diagnostico']);
+Route::get(
+    '/admin/dashboard',
+    [DashboardController::class, 'index']
+)->name('admin.dashboard');
+
+Route::resource(
+    '/admin/occurrences',
+    OccurrenceController::class
+)->names('admin.occurrences');
