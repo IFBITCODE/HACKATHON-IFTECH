@@ -1,0 +1,35 @@
+body {
+  background: #0f1419;
+  font-family: 'Montserrat', sans-serif;
+  color: #fff;
+  text-align: center;
+}
+
+.hero {
+  margin-top: 150px;
+}
+
+.search-box {
+  margin-top: 20px;
+}
+
+input {
+  width: 400px;
+  padding: 15px;
+  border-radius: 30px;
+  border: none;
+  outline: none;
+}
+
+button {
+  margin-left: 10px;
+  padding: 15px 20px;
+  border-radius: 30px;
+  border: none;
+  background: #00c896;
+  cursor: pointer;
+}
+
+#resultados {
+  margin-top: 50px;
+}

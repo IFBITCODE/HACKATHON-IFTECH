@@ -3,11 +3,28 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ChatbotController;
 
+
+//rota da pagina principal do usuario/turista 
 Route::get('/', function () {
-    return view('HomeUsuario');
+    return view('usuario.HomeUsuario');
 });
 
 
+// rota da pagina principal da prefeitura
+Route::get('/prefeitura', function () {
+    return view('prefeitura.homePrefeitura');
+});
+
+//rota da pagina principal do empreendedor
+Route::get('/empreededor', function () {
+    return view('empreendedor.homeEmpreendedor');
+});
+
+
+
+Route::get('/chat', function () {
+    return view('chat');
+});
 
 // Rota para abrir a página do chat (Método GET)
 Route::get('/chat', [ChatbotController::class, 'index']);
@@ -17,3 +34,4 @@ Route::post('/chat', [ChatbotController::class, 'responder']);
 
 Route::get('/diagnostico', [ChatbotController::class, 'diagnostico']);
 
+Route::get('/diagnostico', [ChatbotController::class, 'diagnostico']);
