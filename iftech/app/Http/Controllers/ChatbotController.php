@@ -4,32 +4,50 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use App\Models\Empreendedor; 
 
 class ChatbotController extends Controller
 {
+    // 1. ESTA É A FUNÇÃO QUE FALTAVA (Para abrir a tela do chat)
     public function index() {
-        return view('chat');
+        return view('chat', [
+            'resposta' => null,
+            'mensagemUser' => null
+        ]);
     }
 
-   public function responder(Request $request) {
+    // 2. A sua função responder continua aqui embaixo normalmente
+    public function responder(Request $request) {
         $mensagemUser = $request->input('mensagem'); 
         $apiKey = env('GEMINI_API_KEY');
 
-        // 1. Variável para guardar o texto do seu arquivo v3
-        // IMPORTANTE: Substitua o texto abaixo pelo conteúdo real do seu arquivo v3
-        $contextoV3 = "COLE TODO O CONTEÚDO DO SEU ARQUIVO V3 AQUI. Pode ser um texto longo explicando o que é o projeto, como ele funciona, etc.";
-
-        // 2. A MÁGICA AQUI: Instruções super restritivas (Filtros)
-        $mensagemParaIA = "Você é um assistente virtual estrito criado para ser um especialista em turismo municipal de Joao Pessoa - PB.
+        // 1. Busca no banco de dados apenas as empresas aprovadas pela prefeitura
+        $parceirosAprovados = Empreendedor::where('status', 'aprovado')->get();
         
-        Regras de Ouro:
-        1. BASE DE CONHECIMENTO: Use ÚNICA e EXCLUSIVAMENTE o seguinte texto para formular suas respostas: '{$contextoV3}'.
-        2. FORA DE ESCOPO: Se o usuário perguntar qualquer coisa que não esteja no texto acima (como receitas, curiosidades, 'como fazer uma pipa', matemática, etc.), você DEVE recusar a responder dizendo exatamente: 'Desculpe, meu conhecimento é limitado apenas ao turismo municipal.'
-        3. TAMANHO: Seja extremamente direto e conciso. Suas respostas não podem ultrapassar 1 parágrafo curto. Vá direto ao ponto.
-        4. IDIOMA: Responda obrigatoriamente em Português do Brasil (pt-BR).
-        
+        // 2. Transforma os dados do banco em um texto que a IA consiga ler
+        $textoParceiros = "";
+        if ($parceirosAprovados->count() > 0) {
+            foreach ($parceirosAprovados as $parceiro) {
+                $textoParceiros .= "- Nome: {$parceiro->nome_fantasia} | Cidade: {$parceiro->cidade} | Descrição: {$parceiro->descricao}\n";
+            }
+        } else {
+            $textoParceiros = "Ainda não temos parceiros cadastrados nesta região.";
+        }
 
-        Pergunta do usuário: " . $mensagemUser;
+        // 3. O Novo "Cérebro" da IA com regras de Gamificação e Escopo Flexível
+        $mensagemParaIA = "Você é um assistente virtual de turismo criado para o Hackathon IFTECH.
+        
+        NOSSOS PARCEIROS OFICIAIS CADASTRADOS:
+        {$textoParceiros}
+
+        REGRAS DE FUNCIONAMENTO:
+        1. ESCOPO: Você deve falar APENAS sobre turismo, gastronomia, hospedagem e passeios na região (como, por exemplo, opções em Campina Grande e arredores). Se o usuário perguntar algo totalmente fora desse universo (como matemática, programação, consertos, etc.), recuse dizendo: 'Desculpe, meu conhecimento é limitado apenas ao turismo municipal.'
+        2. RECOMENDAÇÕES (PRIORIDADE): Se o usuário pedir dicas de onde ir (comer, dormir, passear), primeiro verifique se há algum estabelecimento na lista de 'NOSSOS PARCEIROS OFICIAIS' que atenda ao pedido.
+           - Se houver: Recomende-o e adicione OBRIGATORIAMENTE a frase exata: 'se voce for nesse que é nosso parceiro voce pode ganhar algumas moedas de troca'. Em seguida, dê mais 1 opção de conhecimento geral para dar variedade.
+        3. SEM PARCEIROS: Se o usuário pedir algo (ex: restaurante) e a lista de parceiros não tiver nenhum restaurante cadastrado, não bloqueie a conversa. Apenas recomende 2 lugares reais e legais da cidade usando seu conhecimento geral.
+        4. TAMANHO: Seja amigável, direto ao ponto (máximo 2 parágrafos) e responda em pt-BR.
+
+        Mensagem do usuário: " . $mensagemUser;
 
         $url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent';
 
