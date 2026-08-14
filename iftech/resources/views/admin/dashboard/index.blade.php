@@ -48,6 +48,11 @@
             color: #6b7280;
         }
 
+        .primary {
+            background: #0d6efd;
+            color: white;
+        }
+
         .filter {
             background: white;
             padding: 20px;
@@ -214,6 +219,10 @@
                 para apoio à gestão turística.
             </p>
         </div>
+
+        <a href="{{ route('prefeitura.home') }}" class="primary" style="padding: 10px 15px; color: white; text-decoration: none; border-radius: 7px; height: 40px; display: flex; align-items: center;">
+            ← Voltar à Prefeitura
+        </a>
     </div>
 
     {{-- FILTRO --}}

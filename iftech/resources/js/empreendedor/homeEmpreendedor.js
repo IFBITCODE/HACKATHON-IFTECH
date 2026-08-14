@@ -153,21 +153,3 @@ if (loginForm) {
 }
 
 });
-
-document.addEventListener('DOMContentLoaded', () => {
-    const loginForm = document.getElementById('loginForm');
-
-    if (loginForm) {
-        loginForm.addEventListener('submit', function (e) {
-            e.preventDefault(); // Impede o envio padrão
-
-            // Validação simples do HTML5
-            if (this.checkValidity()) {
-                // Redireciona para o arquivo do painel
-                window.location.href = 'painel.html'; // Altere para o nome correto do seu arquivo/rota
-            } else {
-                this.classList.add('was-validated');
-            }
-        });
-    }
-});
