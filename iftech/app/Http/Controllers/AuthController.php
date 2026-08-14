@@ -66,6 +66,45 @@ class AuthController extends Controller
         ]);
     }
 
+    public function loginByRole(Request $request, string $role)
+    {
+        $dados = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|string',
+        ]);
+
+        $user = User::where('email', $dados['email'])->first();
+
+        if (!$user || !Hash::check($dados['password'], $user->password)) {
+            return response()->json([
+                'message' => 'Email ou senha inválido!!!'
+            ], 401);
+        }
+
+        if ($user->role !== $role) {
+            return response()->json([
+                'message' => 'Acesso não permitido para este tipo de usuário.'
+            ], 403);
+        }
+
+        Auth::login($user);
+
+        $request->session()->regenerate();
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'message' => 'Login realizado com sucesso!!!',
+            'token' => $token,
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => $user->role,
+            ],
+        ]);
+    }
+
     public function redirectToGoogle()
     {
         return Socialite::driver('google')
