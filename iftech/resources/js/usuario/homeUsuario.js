@@ -1,254 +1,604 @@
-document.addEventListener("DOMContentLoaded",()=>{
+document.addEventListener("DOMContentLoaded", () => {
 
-const searchForm=document.getElementById("searchForm");
-const searchInput=document.getElementById("searchInput");
-const searchButton=document.getElementById("searchButton");
-const searchResult=document.getElementById("searchResult");
-const resultTag=document.getElementById("resultTag");
-const resultBody=document.getElementById("resultBody");
+    /*
+    |--------------------------------------------------------------------------
+    | BUSCA / GUIA TURÍSTICO
+    |--------------------------------------------------------------------------
+    */
 
-if(searchForm&&searchInput){
-searchForm.addEventListener("submit",async e=>{
-e.preventDefault();
+    const searchForm = document.getElementById("searchForm");
+    const searchInput = document.getElementById("searchInput");
+    const searchButton = document.getElementById("searchButton");
+    const searchResult = document.getElementById("searchResult");
+    const resultTag = document.getElementById("resultTag");
+    const resultBody = document.getElementById("resultBody");
 
-const mensagem=searchInput.value.trim();
-if(!mensagem)return;
+    if (searchForm && searchInput) {
 
-searchButton.disabled=true;
-searchButton.innerHTML='<i class="fa-solid fa-circle-notch fa-spin"></i>';
-searchResult.classList.add("active");
-resultTag.textContent="Consultando Guia...";
-resultBody.innerHTML='<div class="loading-state"><i class="fa-solid fa-sparkles"></i> Buscando os melhores locais para você...</div>';
+        searchForm.addEventListener("submit", async (e) => {
 
-const tokenMeta=document.querySelector('meta[name="csrf-token"]');
-const token=tokenMeta?tokenMeta.getAttribute("content"):"";
+            e.preventDefault();
 
-try{
-const response=await fetch(searchForm.action,{
-method:"POST",
-headers:{
-"Content-Type":"application/json",
-"X-CSRF-TOKEN":token,
-"Accept":"application/json",
-"X-Requested-With":"XMLHttpRequest"
-},
-body:JSON.stringify({mensagem})
-});
+            const mensagem = searchInput.value.trim();
 
-const data=await response.json();
+            if (!mensagem) {
+                return;
+            }
 
-if(response.ok&&data.resposta){
-resultTag.textContent="Sugestões de Turismo";
+            searchButton.disabled = true;
 
-let textoFormatado=data.resposta
-.replace(/\n/g,"<br>")
-.replace(/(se voce for nesse que é nosso parceiro voce pode ganhar algumas moedas de troca)/gi,'<span class="badge-parceiro"><i class="fa-solid fa-coins"></i> $1</span>');
+            searchButton.innerHTML =
+                '<i class="fa-solid fa-circle-notch fa-spin"></i>';
 
-resultBody.innerHTML=textoFormatado;
-}else{
-resultTag.textContent="Aviso do Sistema";
-resultBody.innerHTML=`<div class="error-msg">${data.resposta||data.erro||"Não foi possível obter resposta no momento."}</div>`;
-}
+            searchResult.classList.add("active");
 
-}catch(error){
-console.error("Erro na busca:",error);
-resultTag.textContent="Erro de Conexão";
-resultBody.innerHTML='<div class="error-msg">Ocorreu um erro ao conectar ao servidor. Tente novamente.</div>';
-}finally{
-searchButton.disabled=false;
-searchButton.innerHTML='<i class="fa-solid fa-magnifying-glass"></i>';
-searchResult.scrollIntoView({behavior:"smooth",block:"nearest"});
-}
-});
-}
+            resultTag.textContent = "Consultando Guia...";
 
-const loginBtn=document.getElementById("openLogin");
-const loginModal=document.getElementById("loginModal");
-const closeLogin=document.getElementById("closeLogin");
-const fakeLoginForm=document.getElementById("fakeLoginForm");
-const googleLogin=document.getElementById("googleLogin");
-const registerFake=document.getElementById("registerFake");
-const loginMessage=document.getElementById("loginMessage");
+            resultBody.innerHTML =
+                '<div class="loading-state">' +
+                '<i class="fa-solid fa-sparkles"></i> ' +
+                'Buscando os melhores locais para você...' +
+                '</div>';
 
-const coinsBtn=document.getElementById("coinsToggle");
-const sidebar=document.getElementById("coinsSidebar");
-const closeSidebar=document.getElementById("closeSidebar");
-const sidebarOverlay=document.getElementById("sidebarOverlay");
-const coinsValue=document.getElementById("coinsValue");
-const codeForm=document.getElementById("codeForm");
-const codeInput=document.getElementById("codeInput");
-const codeMessage=document.getElementById("codeMessage");
+            const tokenMeta = document.querySelector(
+                'meta[name="csrf-token"]'
+            );
 
-const codes={
-"TURISMO100":100,
-"ROTAPB50":50,
-"GUIA25":25
-};
+            const token = tokenMeta
+                ? tokenMeta.getAttribute("content")
+                : "";
 
-function getUser(){
-try{
-return JSON.parse(localStorage.getItem("fakeUser"));
-}catch{
-return null;
-}
-}
+            try {
 
-function saveUser(user){
-localStorage.setItem("fakeUser",JSON.stringify(user));
-}
+                const response = await fetch(searchForm.action, {
+                    method: "POST",
 
-function updateInterface(){
-const user=getUser();
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": token,
+                        "Accept": "application/json",
+                        "X-Requested-With": "XMLHttpRequest"
+                    },
 
-if(user){
-loginBtn.textContent="Sair";
-coinsBtn.style.display="flex";
-coinsBtn.style.alignItems="center";
-coinsBtn.style.justifyContent="center";
-coinsValue.textContent=user.moedas||0;
-}else{
-loginBtn.textContent="Entrar";
-coinsBtn.style.display="none";
-coinsValue.textContent="0";
-sidebar.classList.remove("active");
-sidebarOverlay.classList.remove("active");
-}
-}
+                    body: JSON.stringify({
+                        mensagem: mensagem
+                    })
+                });
 
-loginBtn.addEventListener("click",e=>{
-e.preventDefault();
+                const data = await response.json();
 
-const user=getUser();
+                if (response.ok && data.resposta) {
 
-if(user){
-localStorage.removeItem("fakeUser");
-updateInterface();
-return;
-}
+                    resultTag.textContent =
+                        "Sugestões de Turismo";
 
-loginModal.classList.add("active");
-});
+                    const textoFormatado = data.resposta
+                        .replace(/\n/g, "<br>")
+                        .replace(
+                            /(se voce for nesse que é nosso parceiro voce pode ganhar algumas moedas de troca)/gi,
+                            '<span class="badge-parceiro">' +
+                            '<i class="fa-solid fa-coins"></i> $1' +
+                            '</span>'
+                        );
 
-closeLogin.addEventListener("click",()=>{
-loginModal.classList.remove("active");
-loginMessage.textContent="";
-});
+                    resultBody.innerHTML = textoFormatado;
 
-loginModal.addEventListener("click",e=>{
-if(e.target===loginModal){
-loginModal.classList.remove("active");
-loginMessage.textContent="";
-}
-});
+                } else {
 
-fakeLoginForm.addEventListener("submit",e=>{
-e.preventDefault();
+                    resultTag.textContent =
+                        "Aviso do Sistema";
 
-const email=document.getElementById("loginEmail").value.trim();
-const password=document.getElementById("loginPassword").value.trim();
+                    resultBody.innerHTML =
+                        `<div class="error-msg">
+                            ${data.resposta ||
+                            data.erro ||
+                            "Não foi possível obter resposta no momento."}
+                        </div>`;
+                }
 
-if(!email||!password)return;
+            } catch (error) {
 
-saveUser({
-nome:"Usuário Teste",
-email:email,
-moedas:25
-});
+                console.error("Erro na busca:", error);
 
-loginModal.classList.remove("active");
-fakeLoginForm.reset();
-updateInterface();
-});
+                resultTag.textContent =
+                    "Erro de Conexão";
 
-googleLogin.addEventListener("click",()=>{
-saveUser({
-nome:"Usuário Google",
-email:"google@teste.com",
-moedas:25
-});
+                resultBody.innerHTML =
+                    '<div class="error-msg">' +
+                    'Ocorreu um erro ao conectar ao servidor. ' +
+                    'Tente novamente.' +
+                    '</div>';
 
-loginModal.classList.remove("active");
-updateInterface();
-});
+            } finally {
 
-registerFake.addEventListener("click",e=>{
-e.preventDefault();
+                searchButton.disabled = false;
 
-const email=document.getElementById("loginEmail").value.trim();
+                searchButton.innerHTML =
+                    '<i class="fa-solid fa-magnifying-glass"></i>';
 
-if(!email){
-loginMessage.textContent="EM DESENVOLVIMENTO";
-return;
-}
+                searchResult.scrollIntoView({
+                    behavior: "smooth",
+                    block: "nearest"
+                });
+            }
+        });
+    }
 
-saveUser({
-nome:"Novo Usuário",
-email:email,
-moedas:10
-});
 
-loginModal.classList.remove("active");
-fakeLoginForm.reset();
-updateInterface();
-});
+    /*
+    |--------------------------------------------------------------------------
+    | ELEMENTOS DE LOGIN
+    |--------------------------------------------------------------------------
+    */
 
-coinsBtn.addEventListener("click",()=>{
-if(!getUser())return;
-sidebar.classList.add("active");
-sidebarOverlay.classList.add("active");
-});
+    const loginBtn = document.getElementById("openLogin");
+    const loginModal = document.getElementById("loginModal");
+    const closeLogin = document.getElementById("closeLogin");
+    const fakeLoginForm = document.getElementById("fakeLoginForm");
+    const googleLogin = document.getElementById("googleLogin");
+    const registerFake = document.getElementById("registerFake");
+    const loginMessage = document.getElementById("loginMessage");
 
-closeSidebar.addEventListener("click",()=>{
-sidebar.classList.remove("active");
-sidebarOverlay.classList.remove("active");
-});
 
-sidebarOverlay.addEventListener("click",()=>{
-sidebar.classList.remove("active");
-sidebarOverlay.classList.remove("active");
-});
+    /*
+    |--------------------------------------------------------------------------
+    | ELEMENTOS DAS MOEDAS
+    |--------------------------------------------------------------------------
+    */
 
-codeForm.addEventListener("submit",e=>{
-e.preventDefault();
+    const coinsBtn = document.getElementById("coinsToggle");
+    const sidebar = document.getElementById("coinsSidebar");
+    const closeSidebar = document.getElementById("closeSidebar");
+    const sidebarOverlay = document.getElementById("sidebarOverlay");
+    const coinsValue = document.getElementById("coinsValue");
+    const codeForm = document.getElementById("codeForm");
+    const codeInput = document.getElementById("codeInput");
+    const codeMessage = document.getElementById("codeMessage");
 
-const user=getUser();
 
-if(!user){
-codeMessage.textContent="Você precisa estar logado.";
-codeMessage.className="code-error";
-return;
-}
+    /*
+    |--------------------------------------------------------------------------
+    | CÓDIGOS DE MOEDAS
+    |--------------------------------------------------------------------------
+    */
 
-const codigo=codeInput.value.trim().toUpperCase();
+    const codes = {
+        "TURISMO100": 100,
+        "ROTAPB50": 50,
+        "GUIA25": 25
+    };
 
-if(!codigo){
-codeMessage.textContent="Digite um código.";
-codeMessage.className="code-error";
-return;
-}
 
-if(!codes[codigo]){
-codeMessage.textContent="Código inválido ou já utilizado.";
-codeMessage.className="code-error";
-return;
-}
+    /*
+    |--------------------------------------------------------------------------
+    | USUÁRIO AUTENTICADO
+    |--------------------------------------------------------------------------
+    |
+    | A autenticação agora é controlada pelo Laravel.
+    |
+    | A Blade deve disponibilizar:
+    |
+    | window.authUser
+    |
+    */
 
-const moedas=codes[codigo];
+    function getUser() {
+        return window.authUser || null;
+    }
 
-user.moedas=(user.moedas||0)+moedas;
 
-saveUser(user);
+    /*
+    |--------------------------------------------------------------------------
+    | ATUALIZA INTERFACE
+    |--------------------------------------------------------------------------
+    */
 
-coinsValue.textContent=user.moedas;
+    function updateInterface() {
 
-codeMessage.textContent=`Código aplicado! +${moedas} moedas.`;
-codeMessage.className="code-success";
+        const user = getUser();
 
-codeInput.value="";
+        if (user) {
 
-delete codes[codigo];
-});
+            loginBtn.textContent = "Sair";
 
-updateInterface();
+            coinsBtn.style.display = "flex";
+            coinsBtn.style.alignItems = "center";
+            coinsBtn.style.justifyContent = "center";
+
+            coinsValue.textContent = user.moedas || 0;
+
+        } else {
+
+            loginBtn.textContent = "Entrar";
+
+            coinsBtn.style.display = "none";
+
+            coinsValue.textContent = "0";
+
+            sidebar.classList.remove("active");
+            sidebarOverlay.classList.remove("active");
+        }
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | BOTÃO ENTRAR / SAIR
+    |--------------------------------------------------------------------------
+    */
+
+    loginBtn.addEventListener("click", async (e) => {
+
+        e.preventDefault();
+
+        const user = getUser();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | USUÁRIO NÃO AUTENTICADO
+        |--------------------------------------------------------------------------
+        */
+
+        if (!user) {
+
+            loginModal.classList.add("active");
+
+            return;
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | USUÁRIO AUTENTICADO
+        |--------------------------------------------------------------------------
+        |
+        | Faz logout através do Laravel.
+        |
+        */
+
+        try {
+
+            const tokenMeta = document.querySelector(
+                'meta[name="csrf-token"]'
+            );
+
+            const token = tokenMeta
+                ? tokenMeta.getAttribute("content")
+                : "";
+
+            const response = await fetch("/logout", {
+
+                method: "POST",
+
+                headers: {
+                    "X-CSRF-TOKEN": token,
+                    "Accept": "application/json",
+                    "X-Requested-With": "XMLHttpRequest"
+                }
+            });
+
+            if (response.ok) {
+
+                window.location.reload();
+
+            } else {
+
+                console.error(
+                    "Erro ao realizar logout."
+                );
+            }
+
+        } catch (error) {
+
+            console.error(
+                "Erro no logout:",
+                error
+            );
+        }
+    });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | FECHAR MODAL DE LOGIN
+    |--------------------------------------------------------------------------
+    */
+
+    closeLogin.addEventListener("click", () => {
+
+        loginModal.classList.remove("active");
+
+        loginMessage.textContent = "";
+    });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | FECHAR MODAL CLICANDO FORA
+    |--------------------------------------------------------------------------
+    */
+
+    loginModal.addEventListener("click", (e) => {
+
+        if (e.target === loginModal) {
+
+            loginModal.classList.remove("active");
+
+            loginMessage.textContent = "";
+        }
+    });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | LOGIN TRADICIONAL
+    |--------------------------------------------------------------------------
+    */
+
+    fakeLoginForm.addEventListener("submit", async (e) => {
+
+        e.preventDefault();
+
+        const email = document
+            .getElementById("loginEmail")
+            .value
+            .trim();
+
+        const password = document
+            .getElementById("loginPassword")
+            .value
+            .trim();
+
+
+        if (!email || !password) {
+
+            loginMessage.textContent =
+                "Preencha email e senha.";
+
+            return;
+        }
+
+
+        loginMessage.textContent =
+            "Entrando...";
+
+
+        try {
+
+            const tokenMeta = document.querySelector(
+                'meta[name="csrf-token"]'
+            );
+
+            const token = tokenMeta
+                ? tokenMeta.getAttribute("content")
+                : "";
+
+
+            const response = await fetch("/api/login", {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                    "X-CSRF-TOKEN": token
+                },
+
+                body: JSON.stringify({
+                    email: email,
+                    password: password
+                })
+            });
+
+
+            const data = await response.json();
+
+
+            if (!response.ok) {
+
+                loginMessage.textContent =
+                    data.message ||
+                    "Email ou senha inválidos.";
+
+                return;
+            }
+
+
+            loginModal.classList.remove("active");
+
+            fakeLoginForm.reset();
+
+            window.location.reload();
+
+
+        } catch (error) {
+
+            console.error(
+                "Erro no login:",
+                error
+            );
+
+            loginMessage.textContent =
+                "Não foi possível conectar ao servidor.";
+        }
+    });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | LOGIN COM GOOGLE
+    |--------------------------------------------------------------------------
+    |
+    | O Laravel será responsável pelo OAuth.
+    |
+    */
+
+    googleLogin.addEventListener("click", () => {
+
+        window.location.href = "/auth/google";
+
+    });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | CADASTRO
+    |--------------------------------------------------------------------------
+    */
+
+    registerFake.addEventListener("click", (e) => {
+
+        e.preventDefault();
+
+        loginMessage.textContent =
+            "EM DESENVOLVIMENTO";
+    });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ABRIR SIDEBAR DE MOEDAS
+    |--------------------------------------------------------------------------
+    */
+
+    coinsBtn.addEventListener("click", () => {
+
+        if (!getUser()) {
+            return;
+        }
+
+        sidebar.classList.add("active");
+
+        sidebarOverlay.classList.add("active");
+    });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | FECHAR SIDEBAR
+    |--------------------------------------------------------------------------
+    */
+
+    closeSidebar.addEventListener("click", () => {
+
+        sidebar.classList.remove("active");
+
+        sidebarOverlay.classList.remove("active");
+    });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | FECHAR SIDEBAR PELO OVERLAY
+    |--------------------------------------------------------------------------
+    */
+
+    sidebarOverlay.addEventListener("click", () => {
+
+        sidebar.classList.remove("active");
+
+        sidebarOverlay.classList.remove("active");
+    });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | APLICAR CÓDIGO DE MOEDAS
+    |--------------------------------------------------------------------------
+    */
+
+    codeForm.addEventListener("submit", (e) => {
+
+        e.preventDefault();
+
+        const user = getUser();
+
+
+        if (!user) {
+
+            codeMessage.textContent =
+                "Você precisa estar logado.";
+
+            codeMessage.className =
+                "code-error";
+
+            return;
+        }
+
+
+        const codigo = codeInput.value
+            .trim()
+            .toUpperCase();
+
+
+        if (!codigo) {
+
+            codeMessage.textContent =
+                "Digite um código.";
+
+            codeMessage.className =
+                "code-error";
+
+            return;
+        }
+
+
+        if (!codes[codigo]) {
+
+            codeMessage.textContent =
+                "Código inválido ou já utilizado.";
+
+            codeMessage.className =
+                "code-error";
+
+            return;
+        }
+
+
+        const moedas = codes[codigo];
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | ATENÇÃO
+        |--------------------------------------------------------------------------
+        |
+        | Neste momento, as moedas ainda estão sendo mantidas
+        | somente no objeto da página.
+        |
+        | Posteriormente devemos persistir isso no banco.
+        |
+        */
+
+        user.moedas =
+            (user.moedas || 0) + moedas;
+
+
+        coinsValue.textContent =
+            user.moedas;
+
+
+        codeMessage.textContent =
+            `Código aplicado! +${moedas} moedas.`;
+
+        codeMessage.className =
+            "code-success";
+
+
+        codeInput.value = "";
+
+
+        delete codes[codigo];
+    });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | INICIALIZAÇÃO
+    |--------------------------------------------------------------------------
+    */
+
+    updateInterface();
 
 });

@@ -10,6 +10,10 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <script>
+        window.authUser = @json(auth()->user());
+    </script>
+
     @vite([
         'resources/css/usuario/homeUsuario.css',
         'resources/js/usuario/homeUsuario.js'
@@ -60,15 +64,27 @@
                 <span>ou</span>
             </div>
 
-            <button type="button" class="google-button" id="googleLogin">
+            <a
+                href="{{ route('google.login') }}"
+                class="google-button"
+                id="googleLogin"
+            >
                 <i class="fa-brands fa-google"></i>
                 Entrar com Google
-            </button>
+            </a>
 
             <p class="register-link">
                 Não tem conta?
                 <a href="#" id="registerFake">Cadastrar</a>
             </p>
+
+            <div id="loginMessage">
+                @if(session('google_login_error'))
+                    <div class="login-error">
+                        {{ session('google_login_error') }}
+                    </div>
+                @endif
+            </div>
 
             <div id="loginMessage"></div>
 
