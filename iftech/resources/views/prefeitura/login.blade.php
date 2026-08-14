@@ -98,7 +98,8 @@
             Acesso administrativo
         </p>
 
-        <form id="loginForm">
+        <form method="POST" action="{{ route('login-prefeitura.submit') }}">
+            @csrf
 
             <div class="form-group">
                 <label for="email">E-mail</label>
@@ -204,6 +205,5 @@
 
         });
     </script>
-
 </body>
 </html>

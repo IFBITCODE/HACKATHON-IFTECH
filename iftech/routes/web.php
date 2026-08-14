@@ -6,33 +6,47 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OccurrenceController;
 use App\Http\Controllers\EmpreendedorController;
 use App\Http\Controllers\PrefeituraDashboardController;
+use App\Http\Controllers\AuthController;
 
-/*
-| ÁREA PÚBLICA / USUÁRIO
-*/
+// ==========================================
+// ÁREA PÚBLICA / USUÁRIO
+// ==========================================
+
 // Página principal do usuário/turista
 Route::get('/', function () {
     return view('usuario.HomeUsuario');
-})->name('home');
+});
+// ==========================================
+// ÁREA DA PREFEITURA
+// ==========================================
 
-
-/*
-| ÁREA DA PREFEITURA
-
-*/
 // Página de login da prefeitura
 Route::get('/login-prefeitura', function () {
-    return view('prefeitura.loginPrefeitura.login');
-});
+    return view('prefeitura.login');
+}) ->name('login');
+
+Route::post('/login-prefeitura', [AuthController::class, 'loginPrefeitura'])
+    ->name('login-prefeitura.submit');
+
+Route::post('/logout-prefeitura', [AuthController::class, 'logoutPrefeitura'])
+    ->middleware('auth')
+    ->name('logout-prefeitura');
+
+Route::get('/logado-prefeitura', [PrefeituraDashboardController::class, 'index'])
+    ->middleware(['auth', 'prefeitura'])
+    ->name('prefeitura.homePrefeitura');
+>>>>>>> 3572304 (correção do login prefeitura e implemntação do logout)
 
 // Página principal da prefeitura
-Route::get('/logado-prefeitura', [PrefeituraDashboardController::class, 'index'])
-    ->name('prefeitura.home');
+Route::get(
+    '/prefeitura',
+    [PrefeituraDashboardController::class, 'index']
+)->name('prefeitura.home');
 
-/*
-| ÁREA DO EMPREENDEDOR
+// ==========================================
+// ÁREA DO EMPREENDEDOR
+// ==========================================
 
-*/
 // Tela de Login/Cadastro
 
 Route::get('/login-empreendedor', function () {
@@ -61,25 +75,22 @@ Route::middleware('auth')->group(function () {
     Route::post('/usuario/codigos/usar', [EmpreendedorController::class, 'usarCodigo']);
 });
 
-/*
-| CHATBOT / GUIA TURÍSTICO
-*/
 // Abrir o chat
 Route::get('/chat', [ChatbotController::class, 'index']);
-
-// Enviar pergunta via AJAX/Fetch
-Route::post('/chat', [ChatbotController::class, 'responder']);
 
 // Diagnóstico do chatbot
 Route::get('/diagnostico', [ChatbotController::class, 'diagnostico']);
 
+// ==========================================
+// ADMIN
+// ==========================================
 
-/*
-| ADMIN
+Route::get(
+    '/admin/dashboard',
+    [DashboardController::class, 'index']
+)->name('admin.dashboard');
 
-*/
-Route::get('/admin/dashboard', [DashboardController::class, 'index'])
-    ->name('admin.dashboard');
-
-Route::resource('/admin/occurrences', OccurrenceController::class)
-    ->names('admin.occurrences');
+Route::resource(
+    '/admin/occurrences',
+    OccurrenceController::class
+)->names('admin.occurrences');

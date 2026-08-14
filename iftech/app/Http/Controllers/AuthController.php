@@ -68,6 +68,7 @@ class AuthController extends Controller
         ]);
     }
 
+
     public function loginByRole(Request $request, string $role)
     {
         $dados = $request->validate([
@@ -109,5 +110,40 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
 
         return response()->json(['message' => 'Logout realizado com sucesso!']);
+
+    public function loginPrefeitura(Request $request)
+    {
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
+        ]);
+
+        if (!Auth::attempt($credentials)) {
+            return back()->withErrors([
+                'email' => 'Email ou senha inválidos.'
+            ])->withInput();
+        }
+
+        $request->session()->regenerate();
+
+        if (Auth::user()->role !== 'prefeito') {
+            Auth::logout();
+
+            return back()->withErrors([
+                'email' => 'Acesso permitido apenas para prefeitos.'
+            ]);
+        }
+
+        return redirect()->route('prefeitura.homePrefeitura');
+    }
+
+    public function logoutPrefeitura(Request $request)
+    {
+        Auth::logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('login');
     }
 }

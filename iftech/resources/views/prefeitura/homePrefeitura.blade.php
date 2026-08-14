@@ -45,6 +45,13 @@
             <span class="navbar-text text-light">
                 Bem-vindo, Administrador
             </span>
+            <form method="POST" action="{{ route('logout-prefeitura') }}">
+                @csrf
+
+                <button type="submit">
+                    Sair
+                </button>
+            </form>
         </div>
     </nav>
 
@@ -157,6 +164,11 @@
         const token = localStorage.getItem('token') || localStorage.getItem('auth_token');
 
         if (!token) {
+            window.location.href = '/login-prefeitura';
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
             window.location.href = '/login-prefeitura';
         }
         

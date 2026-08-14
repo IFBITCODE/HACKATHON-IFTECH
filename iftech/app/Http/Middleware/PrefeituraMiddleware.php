@@ -16,15 +16,11 @@ class PrefeituraMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         if (!$request->user()) {
-            return response()->json([
-                'message' => 'Usuário não autenticado.'
-            ], 401);
+            return redirect()->route('login-prefeitura');
         }
 
         if ($request->user()->role !== 'prefeito') {
-            return response()->json([
-                'message' => 'Acesso negado. Apenas usuários da prefeitura podem acessar este recurso.'
-            ], 403);
+            abort(403);
         }
             return $next($request);
     }
