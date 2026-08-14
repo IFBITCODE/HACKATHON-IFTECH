@@ -108,39 +108,21 @@ class EmpreendedorController extends Controller
         ]);
     }
 
-    public function painel(Request $request)
+   public function painel(Request $request)
     {
-        $empreendedor = null;
+        // A rota já está protegida pelo middleware 'auth', então aqui
+        // SEMPRE existe um usuário autenticado. Nada de fallback por
+        // query string ou "pega o último do banco" — isso é o que
+        // deixava qualquer pessoa entrar sem login.
+        $empreendedor = Empreendedor::where('user_id', Auth::id())->first();
 
-        // 1. TENTA BUSCAR PELO USUÁRIO AUTENTICADO NO LARAVEL (Ideal para produção)
-        if (Auth::check()) {
-            $empreendedor = Empreendedor::where('user_id', Auth::id())->first();
-        }
-
-        // 2. TENTA BUSCAR PELO E-MAIL VINDO DA URL (Query String ?email=exemplo@email.com)
-        if (!$empreendedor && $request->has('email')) {
-            $user = User::where('email', $request->query('email'))->first();
-            if ($user) {
-                $empreendedor = Empreendedor::where('user_id', $user->id)->first();
-            }
-        }
-
-        // 3. FALLBACK HACKATHON: Pega o último cadastrado se os anteriores falharem
         if (!$empreendedor) {
-            $empreendedor = Empreendedor::latest()->first();
+            // Usuário está logado mas ainda não finalizou o cadastro
+            // de empreendedor (ex.: só criou a conta em /api/register).
+            return redirect('/login-empreendedor')
+                ->with('error', 'Nenhum cadastro de empreendedor encontrado para esta conta.');
         }
 
-        // 4. CRIA UM OBJETO DUMMY (MOCK) SE O BANCO ESTIVER TOTALMENTE VAZIO
-        // Isso impede 100% o Erro 500 ou Tela Preta por variável indefinida na View.
-        if (!$empreendedor) {
-            $empreendedor = new Empreendedor([
-                'nome_fantasia' => 'Empreendedor Teste',
-                'status'        => 'pendente',
-                'descricao'     => 'Nenhum cadastro encontrado no banco de dados ainda.'
-            ]);
-        }
-
-        // 5. Envia a variável $empreendedor garantida para a View
         return view('empreendedor.controleEmpreendedor', [
             'empreendedor' => $empreendedor
         ]);

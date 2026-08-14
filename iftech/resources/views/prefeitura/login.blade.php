@@ -189,7 +189,7 @@
                 );
 
 
-                window.location.href = '/prefeitura';
+                window.location.href = '/logado-prefeitura';
 
             } catch (error) {
 

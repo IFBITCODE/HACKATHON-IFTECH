@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
@@ -48,7 +49,11 @@ class AuthController extends Controller
             ], 401);
         }
 
-        //credencial login
+        // Cria a SESSÃO WEB (necessária para as rotas Blade protegidas por 'auth')
+        Auth::login($user);
+        $request->session()->regenerate();
+
+        //credencial login (mantido para uso via API/AJAX se precisar)
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
@@ -61,5 +66,14 @@ class AuthController extends Controller
                 'role' => $user->role,
             ],
         ]);
+    }
+
+    public function logout(Request $request)
+    {
+        Auth::guard('web')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return response()->json(['message' => 'Logout realizado com sucesso!']);
     }
 }

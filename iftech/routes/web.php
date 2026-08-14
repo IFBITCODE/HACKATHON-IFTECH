@@ -34,17 +34,19 @@ Route::get('/logado-prefeitura', [PrefeituraDashboardController::class, 'index']
 
 */
 // Tela de Login/Cadastro
+
 Route::get('/login-empreendedor', function () {
     return view('empreendedor.homeEmpreendedor');
-});
+})->name('login');
 
-// Painel do empreendedor (Atalho / Rota Legada)
-Route::get('/empreendedor/controle', [EmpreendedorController::class, 'painel']);
+// Painel do empreendedor (Atalho / Rota Legada) — agora exige login
+Route::get('/empreendedor/controle', [EmpreendedorController::class, 'painel'])
+    ->middleware('auth');
 
-// Página de controle do empreendedor oficial
+// Página de controle do empreendedor oficial — agora exige login
 Route::get('/logado-empreendedor', [EmpreendedorController::class, 'painel'])
+    ->middleware('auth')
     ->name('empreendedor.painel');
-
 
 /*
 | CHATBOT / GUIA TURÍSTICO

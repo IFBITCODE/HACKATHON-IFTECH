@@ -11,6 +11,7 @@ Route::get('/user', function (Request $request) {
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/logout', [AuthController::class, 'logout']);
 use App\Http\Controllers\EmpreendedorController;
 
 Route::get('/empreendedores', [EmpreendedorController::class, 'index']);
