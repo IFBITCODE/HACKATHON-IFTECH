@@ -30,7 +30,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 return route('login-empreendedor');
             }
 
-            return route('login');
+            return route('login-prefeitura');
         });
             
             $middleware->validateCsrfTokens(except: [

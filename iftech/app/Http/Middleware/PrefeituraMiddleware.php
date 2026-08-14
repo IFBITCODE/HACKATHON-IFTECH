@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class PrefeituraMiddleware
@@ -20,8 +21,18 @@ class PrefeituraMiddleware
         }
 
         if ($request->user()->role !== 'prefeito') {
-            abort(403);
+            Auth::logout();
+
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return redirect()
+                ->route('login-prefeitura')
+                ->withErrors([
+                    'email' => 'Acesso permitido apenas para prefeitos.'
+                ]);
         }
-            return $next($request);
+
+        return $next($request);
     }
 }

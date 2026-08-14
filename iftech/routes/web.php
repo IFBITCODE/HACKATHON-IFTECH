@@ -11,7 +11,7 @@ use App\Http\Controllers\AuthController;
 // Página principal do usuário/turista
 Route::get('/', function () {
     return view('usuario.HomeUsuario');
-});
+})->name('home');
 // ==========================================
 // ÁREA DA PREFEITURA
 // ==========================================
@@ -34,7 +34,7 @@ Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallbac
 // Página de login da prefeitura
 Route::get('/login-prefeitura', function () {
     return view('prefeitura.login');
-}) ->name('login');
+}) ->name('login-prefeitura');
 
 Route::post('/login-prefeitura', [AuthController::class, 'loginPrefeitura'])
     ->name('login-prefeitura.submit');
