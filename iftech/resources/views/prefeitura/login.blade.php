@@ -188,11 +188,8 @@
                     JSON.stringify(data.user)
                 );
 
-<<<<<<< HEAD
                 window.location.href = '/home-prefeitura';
-=======
                 window.location.href = '/prefeitura';
->>>>>>> acc9de7 (agrupando dashboard a tela de gestão da prefeitura)
 
             } catch (error) {
 
