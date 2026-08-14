@@ -8,15 +8,15 @@ use App\Models\Empreendedor;
 
 class ChatbotController extends Controller
 {
-    // 1. ESTA É A FUNÇÃO QUE FALTAVA (Para abrir a tela do chat)
+    // 1. Abre a tela inicial de busca (homeUsuario)
     public function index() {
-        return view('chat', [
+        return view('usuario.homeUsuario', [
             'resposta' => null,
             'mensagemUser' => null
         ]);
     }
 
-    // 2. A sua função responder continua aqui embaixo normalmente
+    // 2. Processa a pesquisa e retorna mantendo a mesma página
     public function responder(Request $request) {
         $mensagemUser = $request->input('mensagem'); 
         $apiKey = env('GEMINI_API_KEY');
@@ -34,7 +34,7 @@ class ChatbotController extends Controller
             $textoParceiros = "Ainda não temos parceiros cadastrados nesta região.";
         }
 
-        // 3. O Novo "Cérebro" da IA com regras de Gamificação e Escopo Flexível
+        // 3. O "Cérebro" da IA com regras de Gamificação e Escopo Flexível
         $mensagemParaIA = "Você é um assistente virtual de turismo criado para o Hackathon IFTECH.
         
         NOSSOS PARCEIROS OFICIAIS CADASTRADOS:
@@ -67,18 +67,28 @@ class ChatbotController extends Controller
 
             if ($respostaAPI->successful()) {
                 $dados = $respostaAPI->json();
-                $respostaBot = $dados['candidates'][0]['content']['parts'][0]['text'];
+                $respostaBot = $dados['candidates'][0]['content']['parts'][0]['text'] ?? 'Sem resposta da IA.';
             } else {
                 $erroDoGoogle = $respostaAPI->json();
                 $mensagemDeErro = $erroDoGoogle['error']['message'] ?? 'Erro desconhecido na API';
-                $respostaBot = "O Google negou o acesso. Motivo: " . $mensagemDeErro;
+                $respostaBot = "Aviso da API: " . $mensagemDeErro;
             }
 
         } catch (\Exception $e) {
             $respostaBot = "Ocorreu um erro de conexão: " . $e->getMessage();
         }
 
-        return view('chat', [
+        // SE A REQUISIÇÃO VIER VIA JAVASCRIPT (AJAX / FETCH)
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'resposta' => $respostaBot,
+                'mensagemUser' => $mensagemUser
+            ]);
+        }
+
+        // SE O NAVEGADOR RECARREGAR (SUBMIT TRADICIONAL)
+        // Retorna a view correta da sua home com os resultados inseridos abaixo da busca
+        return view('usuario.homeUsuario', [
             'resposta' => $respostaBot,
             'mensagemUser' => $mensagemUser
         ]);

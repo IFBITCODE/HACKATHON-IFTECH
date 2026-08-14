@@ -1,7 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Roboto:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Roboto:wght@400;500;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Anton&display=swap');
 
-/* Reset e Fundo na cor #2c92be */
 * {
     margin: 0;
     padding: 0;
@@ -10,13 +9,12 @@
 
 html, body, .landing-page {
     width: 100%;
-    height: 100%;
+    min-height: 100%;
     background-color: #2c92be;
     font-family: 'Roboto', system-ui, -apple-system, sans-serif;
     overflow-x: hidden;
 }
 
-/* Estrutura Principal e Centralização */
 .hero {
     min-height: 100vh;
     display: flex;
@@ -31,233 +29,172 @@ html, body, .landing-page {
     align-items: center;
     width: 100%;
     max-width: 680px;
-    margin-top: -180px; /* Eleva o bloco do título e busca */
+    margin-top: -100px;
 }
 
-/* Estilo do Título */
+/* Logo */
+.brand {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+}
+
 .brand h1 {
     font-family: 'Anton', sans-serif;
-    font-size: 6.5rem;
+    font-size: 6rem;
     font-weight: 700;
     letter-spacing: 4px;
     color: #FFFFFF;
-    margin: 0 0 30px 0;
+    margin: 0 0 25px 0;
     text-transform: uppercase;
     text-align: center;
     line-height: 1;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    text-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     display: inline-block; 
-    transform: scaleY(1.2); 
+    transform: scaleY(1.15); 
+    transform-origin: center center;
 }
 
-/* Destaque escuro na letra IA */
 .brand h1 span {
     color: #111e28;
 }
 
-/* Container de Busca */
+/* Form de Busca */
 .search-container {
     width: 100%;
-    margin-top: -40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .search-box {
+    width: 100%;
     display: flex;
     align-items: center;
-    gap: 12px; /* Espaço entre o input e o botão fora dele */
-    background-color: transparent;
+    gap: 12px;
 }
 
-/* Input Branco Separado */
 .search-box input {
     flex: 1;
-    height: 48px;
+    height: 52px;
     background-color: #ffffff;
     border: none;
     outline: none;
     border-radius: 28px;
-    padding: 0 22px;
-    font-size: 1.15rem;
-    color: #202124;
-    font-family: inherit;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.search-box input::placeholder {
-    color: #80868b;
-    font-size: 1.05rem;
-}
-
-/* Botão Amarelo Fora do Input */
-.search-button {
-    height: 48px;
     padding: 0 24px;
-    background-color: #fbbc05; /* Amarelo vibrante */
+    font-size: 1.1rem;
+    color: #202124;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.search-button {
+    height: 52px;
+    width: 58px;
+    background-color: #fbbc05;
     border: none;
     border-radius: 28px;
-    color: #202124;
-    font-weight: 500;
-    font-size: 1rem;
+    color: #111e28;
+    font-size: 1.2rem;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background-color 0.2s ease, transform 0.1s ease;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
 .search-button:hover {
-    background-color: #e5a900; /* Tom mais escuro no hover */
+    background-color: #e5a900;
+    transform: translateY(-1px);
 }
 
-.search-button:active {
-    transform: scale(0.96); /* Efeito de clique */
-}
-
-/* Responsividade para Celulares */
-@media (max-width: 600px) {
-    .hero-content {
-        margin-top: -80px; /* Ajuste suave para telas pequenas */
-    }
-
-    .brand h1 {
-        font-size: 3.3rem;
-        margin-bottom: 20px;
-    }
-
-    .search-box {
-        gap: 8px;
-    }
-
-    .search-box input {
-        height: 42px;
-        font-size: 0.95rem;
-        padding: 0 16px;
-    }
-
-    .search-button {
-        height: 42px;
-        padding: 0 16px;
-    }
-}
-
-.chat-messages {
+/* CARD DE RESULTADOS (FORMATO BONITO) */
+.search-result-container {
     width: 100%;
-    margin-top: 18px;
-
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-
-    animation: chatAppear 0.3s ease;
-}
-
-
-/* Mensagem individual */
-
-.message {
-    width: fit-content;
-    max-width: 85%;
-
-    padding: 12px 16px;
-
-    border-radius: 14px;
-
-    font-size: 0.95rem;
-
-    line-height: 1.5;
-
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-}
-
-
-/* Mensagem do usuário */
-
-.user-message {
-    align-self: flex-end;
-
+    margin-top: 20px;
     background-color: #ffffff;
-
-    color: #202124;
-
-    border-bottom-right-radius: 4px;
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    display: none;
+    opacity: 0;
+    transform: translateY(15px);
+    transition: all 0.3s ease-out;
 }
 
+.search-result-container.active {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
 
-/* Resposta do chatbot */
+.result-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+    border-bottom: 2px solid #f0f2f5;
+    padding-bottom: 10px;
+}
 
-.bot-message {
-    align-self: flex-start;
-
+.header-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     background-color: #111e28;
-
-    color: #ffffff;
-
-    border-bottom-left-radius: 4px;
-}
-
-
-/* Nome "Você" / "RotaGuiada" */
-
-.message-label {
-    font-size: 0.72rem;
-
+    color: #fbbc05;
+    padding: 6px 14px;
+    border-radius: 20px;
     font-weight: 700;
-
-    margin-bottom: 4px;
-
+    font-size: 0.85rem;
     text-transform: uppercase;
-
     letter-spacing: 0.5px;
 }
 
-
-/* Nome do bot amarelo */
-
-.bot-message .message-label {
-    color: #fbbc05;
+.result-body {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: #2c3e50;
 }
 
-
-/* Texto */
-
-.message-text {
-    word-wrap: break-word;
-    overflow-wrap: break-word;
+/* Badge de Destaque para Gamificação/Parceiros */
+.badge-parceiro {
+    display: inline-block;
+    background-color: #fff8e1;
+    color: #b78103;
+    border: 1px solid #ffe082;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin: 6px 0;
 }
 
-
-/* Animação */
-
-@keyframes chatAppear {
-
-    from {
-        opacity: 0;
-        transform: translateY(8px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-
+.loading-state {
+    color: #666;
+    font-style: italic;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-
-/* ==========================================
-   RESPONSIVO
-   ========================================== */
+.error-msg {
+    color: #d32f2f;
+    font-weight: 500;
+}
 
 @media (max-width: 600px) {
-
-    .chat-messages {
-        margin-top: 12px;
+    .brand h1 {
+        font-size: 3.5rem;
+    }
+    
+    .search-box input {
+        height: 46px;
+        font-size: 0.95rem;
     }
 
-    .message {
-        max-width: 90%;
-        font-size: 0.9rem;
-        padding: 10px 13px;
+    .search-button {
+        height: 46px;
+        width: 50px;
     }
-
 }

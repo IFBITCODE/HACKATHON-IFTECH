@@ -6,64 +6,62 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OccurrenceController;
 use App\Http\Controllers\EmpreendedorController;
 
+// ROTAS USUÁRIO / TURISTA
 
-//rota da pagina principal do usuario/turista 
+// Rota raiz (redireciona para tela principal do usuário)
 Route::get('/', function () {
-    return view('HomeUsuario');
+    return view('usuario.homeUsuario');
 });
 
-// Rota para abrir a página de login da prefeitura
-Route::get('/login-prefeitura', function(){
+Route::get('/rotaguiada', function () {
+    return view('usuario.homeUsuario');
+});
+
+
+// ROTAS PREFEITURA
+
+// 1Rota da tela de Login da Prefeitura (Definida como login oficial)
+Route::get('/login-prefeitura', function () {
     return view('prefeitura.login');
+})->name('login');
 
-// PÁGINA PRINCIPAL DA PREFEITURA
-
+// 2. Rota do Painel da Prefeitura
 Route::get('/prefeitura', function () {
     return view('prefeitura.homePrefeitura');
 });
 
-// ==========================================
-// ÁREA DO EMPREENDEDOR
-// ==========================================
 
-// 1. A Rota Pública (Tela de Login/Cadastro)
-Route::get('/empreendedor', function () {
+// ROTAS DO EMPREENDEDOR
 
-// PÁGINA PRINCIPAL DO EMPREENDEDOR
-
-Route::get('/empreendedor', function () {
+// rota para pagina inicial de login do empreendedor
+Route::get('/login-empreendedor', function () {
     return view('empreendedor.homeEmpreendedor');
-})->name('login');
+});
 
-// Rota do Painel VIP (Sem middleware para o Hackathon)
+// Painel do Empreendedor
 Route::get('/empreendedor/controle', [EmpreendedorController::class, 'painel']);
 
-// Abrir o chat, caso você queira acessar /chat diretamente
-Route::get('/chat', [ChatbotController::class, 'index']);
-Route::post('/chat', [ChatbotController::class, 'responder']);
-
-Route::get('/diagnostico', [ChatbotController::class, 'diagnostico']);
-
-Route::get('/diagnostico', [ChatbotController::class, 'diagnostico']);
-
-
 // EMPREENDEDOR LOGADO
+Route::get('/logado-empreendedor', function () {
+    $empreendedor = (object) [
+        'nome_fantasia' => 'Restaurante Sabor Paraibano',
+        'email'         => 'contato@saborparaibano.com',
+        'status'        => 'aprovado', // <- ADICIONADO AQUI ('aprovado' ou 'pendente')
+    ];
 
-Route::get('/logadoempreendedor', function () {
-    return view('empreendedor.controleEmpreendedor');
+    return view('empreendedor.controleEmpreendedor', compact('empreendedor'));
 });
 
 
-// ADMIN
-Route::get(
-    '/admin/dashboard',
-    [DashboardController::class, 'index']
-)->name('admin.dashboard');
+// CHATBOT E DIAGNÓSTICO
+
+Route::get('/chat', [ChatbotController::class, 'index']);
+Route::post('/chat', [ChatbotController::class, 'responder']);
+Route::get('/diagnostico', [ChatbotController::class, 'diagnostico']);
 
 
-Route::resource(
-    '/admin/occurrences',
-    OccurrenceController::class
-)->names('admin.occurrences');
+// ADMIN / OCORRÊNCIAS
+
 Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
+
 Route::resource('/admin/occurrences', OccurrenceController::class)->names('admin.occurrences');
