@@ -110,7 +110,7 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
 
         return response()->json(['message' => 'Logout realizado com sucesso!']);
-
+    }
     public function loginPrefeitura(Request $request)
     {
         $credentials = $request->validate([

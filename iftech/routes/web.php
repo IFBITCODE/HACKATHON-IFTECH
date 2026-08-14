@@ -35,7 +35,6 @@ Route::post('/logout-prefeitura', [AuthController::class, 'logoutPrefeitura'])
 Route::get('/logado-prefeitura', [PrefeituraDashboardController::class, 'index'])
     ->middleware(['auth', 'prefeitura'])
     ->name('prefeitura.homePrefeitura');
->>>>>>> 3572304 (correção do login prefeitura e implemntação do logout)
 
 // Página principal da prefeitura
 Route::get(
