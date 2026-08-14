@@ -26,6 +26,10 @@ return Application::configure(basePath: dirname(__DIR__))
                 return null;
             }
 
+            if ($request->is('empreendedor/*') || $request->is('logado-empreendedor')) {
+                return route('login-empreendedor');
+            }
+
             return route('login');
         });
             
