@@ -111,6 +111,12 @@
     <!-- Lógica de Conexão com a API (Back-end) -->
     <script>
         // Assim que a tela abrir, ele chama a função para buscar os dados
+        const token = localStorage.getItem('token');
+
+        if (!token) {
+            window.location.href = '/login-prefeitura';
+        }
+        
         document.addEventListener('DOMContentLoaded', carregarPendentes);
 
         // 1. Função para buscar no Supabase/Laravel e montar a tabela
@@ -120,7 +126,16 @@
 
             try {
                 // Chama a sua rota GET do PrefeituraController
-                const resposta = await fetch('/api/prefeitura/empreendedores/pendentes');
+                const token = localStorage.getItem('token');
+
+                const resposta = await fetch('/api/prefeitura/empreendedores/pendentes', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'application/json'
+                    }
+                });
+
                 const empreendedores = await resposta.json();
                 
                 tbody.innerHTML = ''; // Limpa o "Carregando..."
@@ -158,9 +173,15 @@
 
             try {
                 // Dispara o PATCH para a sua rota de aprovação
+                const token = localStorage.getItem('token');
+
                 const resposta = await fetch(`/api/prefeitura/empreendedores/${id}/aprovar`, {
                     method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
                 });
                 
                 const resultado = await resposta.json();
@@ -184,10 +205,18 @@
 
             try {
                 // Dispara o PATCH enviando o motivo no 'body'
+                const token = localStorage.getItem('token');
+
                 const resposta = await fetch(`/api/prefeitura/empreendedores/${id}/rejeitar`, {
                     method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                    body: JSON.stringify({ motivo_rejeicao: motivo })
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        motivo_rejeicao: motivo
+                    })
                 });
                 
                 const resultado = await resposta.json();

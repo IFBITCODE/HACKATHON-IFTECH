@@ -5,15 +5,18 @@ use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OccurrenceController;
 
-
-//rota da pagina principal do usuario/turista 
 Route::get('/', function () {
-    return view('usuario.HomeUsuario');
+    return view('HomeUsuario');
 });
 
+// Rota para abrir a página de login da prefeitura
+Route::get('/login-prefeitura', function(){
+    return view('prefeitura.login');
 
-// rota da pagina principal da prefeitura
-Route::get('/prefeitura', function () {
+});
+
+// Rota para home prefeitura
+Route::get('/home-prefeitura', function () {
     return view('prefeitura.homePrefeitura');
 });
 
@@ -52,4 +55,3 @@ Route::resource(
     '/admin/occurrences',
     OccurrenceController::class
 )->names('admin.occurrences');
-

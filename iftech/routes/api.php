@@ -22,7 +22,8 @@ Route::delete('/empreendedores/{id}', [EmpreendedorController::class, 'destroy']
 
 
 
-// Rota para a prefeitura ver quem está aguardando (GET)
+Route::middleware(['auth:sanctum', 'prefeitura'])->group(function(){
+    // Rota para a prefeitura ver quem está aguardando (GET)
 Route::get('/prefeitura/empreendedores/pendentes', [PrefeituraController::class, 'listarPendentes']);
 
 // Rota para a prefeitura APROVAR o empreendedor (PATCH ou PUT)
@@ -30,4 +31,6 @@ Route::patch('/prefeitura/empreendedores/{id}/aprovar', [PrefeituraController::c
 
 // Rota para a prefeitura REJEITAR o empreendedor (PATCH ou PUT)
 Route::patch('/prefeitura/empreendedores/{id}/rejeitar', [PrefeituraController::class, 'rejeitarEmpreendedor']);
+
+});
 
