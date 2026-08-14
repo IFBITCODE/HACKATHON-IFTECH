@@ -188,7 +188,7 @@
                     JSON.stringify(data.user)
                 );
 
-                window.location.href = '/home-prefeitura';
+
                 window.location.href = '/prefeitura';
 
             } catch (error) {

@@ -30,4 +30,23 @@ class DashboardController extends Controller
             compact('data')
         );
     }
+
+    public function prefeitura(Request $request)
+    {
+        $period = $request->get('period', 'month');
+
+        if (!in_array($period, ['month', 'quarter', 'year'])) {
+            $period = 'month';
+        }
+
+        $data = $this->dashboardService->getDashboardData(
+            $period,
+            $request->get('date')
+        );
+
+        return view(
+            'prefeitura.homePrefeitura',
+            compact('data')
+        );
+    }
 }
