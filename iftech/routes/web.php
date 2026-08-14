@@ -7,69 +7,64 @@ use App\Http\Controllers\OccurrenceController;
 use App\Http\Controllers\EmpreendedorController;
 use App\Http\Controllers\PrefeituraDashboardController;
 
-// ==========================================
-// ÁREA PÚBLICA / USUÁRIO
-// ==========================================
-
+/*
+| ÁREA PÚBLICA / USUÁRIO
+*/
 // Página principal do usuário/turista
 Route::get('/', function () {
     return view('usuario.HomeUsuario');
-});
-// ==========================================
-// ÁREA DA PREFEITURA
-// ==========================================
+})->name('home');
 
+
+/*
+| ÁREA DA PREFEITURA
+
+*/
 // Página de login da prefeitura
 Route::get('/login-prefeitura', function () {
     return view('prefeitura.login');
 });
 
 // Página principal da prefeitura
-Route::get(
-    '/prefeitura',
-    [PrefeituraDashboardController::class, 'index']
-)->name('prefeitura.home');
+Route::get('/logado-prefeitura', [PrefeituraDashboardController::class, 'index'])
+    ->name('prefeitura.home');
 
-// ==========================================
-// ÁREA DO EMPREENDEDOR
-// ==========================================
+/*
+| ÁREA DO EMPREENDEDOR
 
+*/
 // Tela de Login/Cadastro
-Route::get('/empreendedor', function () {
+Route::get('/login-empreendedor', function () {
     return view('empreendedor.homeEmpreendedor');
 });
 
-// Painel do empreendedor
-Route::get(
-    '/empreendedor/controle',
-    [EmpreendedorController::class, 'painel']
-);
+// Painel do empreendedor (Atalho / Rota Legada)
+Route::get('/empreendedor/controle', [EmpreendedorController::class, 'painel']);
 
-// Página de controle do empreendedor
-Route::get('/logadoempreendedor', function () {
-    return view('empreendedor.controleEmpreendedor');
-});
+// Página de controle do empreendedor oficial
+Route::get('/logado-empreendedor', [EmpreendedorController::class, 'painel'])
+    ->name('empreendedor.painel');
 
-// ==========================================
-// CHATBOT
-// ==========================================
 
+/*
+| CHATBOT / GUIA TURÍSTICO
+*/
 // Abrir o chat
 Route::get('/chat', [ChatbotController::class, 'index']);
+
+// Enviar pergunta via AJAX/Fetch
+Route::post('/chat', [ChatbotController::class, 'responder']);
 
 // Diagnóstico do chatbot
 Route::get('/diagnostico', [ChatbotController::class, 'diagnostico']);
 
-// ==========================================
-// ADMIN
-// ==========================================
 
-Route::get(
-    '/admin/dashboard',
-    [DashboardController::class, 'index']
-)->name('admin.dashboard');
+/*
+| ADMIN
 
-Route::resource(
-    '/admin/occurrences',
-    OccurrenceController::class
-)->names('admin.occurrences');
+*/
+Route::get('/admin/dashboard', [DashboardController::class, 'index'])
+    ->name('admin.dashboard');
+
+Route::resource('/admin/occurrences', OccurrenceController::class)
+    ->names('admin.occurrences');

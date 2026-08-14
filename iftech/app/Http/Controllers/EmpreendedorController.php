@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Empreendedor;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -107,37 +108,43 @@ class EmpreendedorController extends Controller
         ]);
     }
 
-
-   public function painel(Request $request)
+    public function painel(Request $request)
     {
-        $email = $request->query('email');
         $empreendedor = null;
-        
-        // 1. Tenta achar o usuário pelo e-mail vindo da URL
-        if ($email) {
-            $user = \App\Models\User::where('email', $email)->first();
+
+        // 1. TENTA BUSCAR PELO USUÁRIO AUTENTICADO NO LARAVEL (Ideal para produção)
+        if (Auth::check()) {
+            $empreendedor = Empreendedor::where('user_id', Auth::id())->first();
+        }
+
+        // 2. TENTA BUSCAR PELO E-MAIL VINDO DA URL (Query String ?email=exemplo@email.com)
+        if (!$empreendedor && $request->has('email')) {
+            $user = User::where('email', $request->query('email'))->first();
             if ($user) {
-                $empreendedor = \App\Models\Empreendedor::where('user_id', $user->id)->first();
+                $empreendedor = Empreendedor::where('user_id', $user->id)->first();
             }
-        } 
-        
-        // 2. FALLBACK HACKATHON: Se não achar o e-mail ou o usuário, 
-        // pega o último empreendedor cadastrado no banco de dados para a tela não quebrar.
-        if (!$empreendedor) {
-            $empreendedor = \App\Models\Empreendedor::latest()->first();
         }
 
-        // 3. Previne erro 500 se o banco de dados estiver completamente vazio
+        // 3. FALLBACK HACKATHON: Pega o último cadastrado se os anteriores falharem
         if (!$empreendedor) {
-            return response('Nenhum empreendedor no banco de dados. Cadastre um primeiro!', 404);
+            $empreendedor = Empreendedor::latest()->first();
         }
 
-        // 4. Manda os dados para a view
+        // 4. CRIA UM OBJETO DUMMY (MOCK) SE O BANCO ESTIVER TOTALMENTE VAZIO
+        // Isso impede 100% o Erro 500 ou Tela Preta por variável indefinida na View.
+        if (!$empreendedor) {
+            $empreendedor = new Empreendedor([
+                'nome_fantasia' => 'Empreendedor Teste',
+                'status'        => 'pendente',
+                'descricao'     => 'Nenhum cadastro encontrado no banco de dados ainda.'
+            ]);
+        }
+
+        // 5. Envia a variável $empreendedor garantida para a View
         return view('empreendedor.controleEmpreendedor', [
             'empreendedor' => $empreendedor
         ]);
     }
-
 
     public function destroy($id)
     {
