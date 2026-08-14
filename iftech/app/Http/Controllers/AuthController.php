@@ -68,6 +68,40 @@ class AuthController extends Controller
         ]);
     }
 
+    public function loginByRole(Request $request, string $role)
+    {
+        $dados = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|string',
+        ]);
+
+        $user = User::where('email', $dados['email'])
+            ->where('role', $role)
+            ->first();
+
+        if (!$user || !Hash::check($dados['password'], $user->password)) {
+            return response()->json([
+                'message' => 'E-mail, senha ou tipo de conta inválido.'
+            ], 401);
+        }
+
+        Auth::login($user);
+        $request->session()->regenerate();
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'message' => 'Login realizado com sucesso!',
+            'token' => $token,
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => $user->role,
+            ],
+        ]);
+    }
+
     public function logout(Request $request)
     {
         Auth::guard('web')->logout();

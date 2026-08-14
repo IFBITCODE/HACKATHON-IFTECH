@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CodigoTroca;
 use App\Models\Empreendedor;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class EmpreendedorController extends Controller
 {
@@ -64,7 +65,6 @@ class EmpreendedorController extends Controller
     {
         $empreendedor = Empreendedor::findOrFail($id);
 
-        // NOVA TRAVA DE SEGURANÇA
         if ($empreendedor->status !== 'aprovado') {
             return response()->json([
                 'message' => 'Ação não permitida. Seu cadastro ainda não foi aprovado pelo município.'
@@ -108,23 +108,100 @@ class EmpreendedorController extends Controller
         ]);
     }
 
-   public function painel(Request $request)
+    public function painel(Request $request)
     {
-        // A rota já está protegida pelo middleware 'auth', então aqui
-        // SEMPRE existe um usuário autenticado. Nada de fallback por
-        // query string ou "pega o último do banco" — isso é o que
-        // deixava qualquer pessoa entrar sem login.
         $empreendedor = Empreendedor::where('user_id', Auth::id())->first();
 
         if (!$empreendedor) {
-            // Usuário está logado mas ainda não finalizou o cadastro
-            // de empreendedor (ex.: só criou a conta em /api/register).
             return redirect('/login-empreendedor')
                 ->with('error', 'Nenhum cadastro de empreendedor encontrado para esta conta.');
         }
 
+        $codigos = CodigoTroca::where('empreendedor_id', $empreendedor->id)
+            ->latest()
+            ->get();
+
         return view('empreendedor.controleEmpreendedor', [
-            'empreendedor' => $empreendedor
+            'empreendedor' => $empreendedor,
+            'codigos' => $codigos,
+        ]);
+    }
+
+    public function gerarCodigo(Request $request)
+    {
+        $dados = $request->validate([
+            'moedas' => 'required|integer|min:1|max:10000',
+        ]);
+
+        $empreendedor = Empreendedor::where('user_id', Auth::id())->first();
+
+        if (!$empreendedor) {
+            return response()->json([
+                'message' => 'Cadastro de empreendedor não encontrado.'
+            ], 404);
+        }
+
+        if ($empreendedor->status !== 'aprovado') {
+            return response()->json([
+                'message' => 'Você só pode gerar códigos depois que seu cadastro for aprovado.'
+            ], 403);
+        }
+
+        do {
+            $codigo = 'RTG-' . strtoupper(Str::random(8));
+        } while (CodigoTroca::where('codigo', $codigo)->exists());
+
+        $codigoTroca = CodigoTroca::create([
+            'empreendedor_id' => $empreendedor->id,
+            'codigo' => $codigo,
+            'moedas' => $dados['moedas'],
+            'status' => 'disponivel',
+        ]);
+
+        return response()->json([
+            'message' => 'Código gerado com sucesso!',
+            'codigo' => $codigoTroca->codigo,
+            'moedas' => $codigoTroca->moedas,
+        ], 201);
+    }
+
+    public function listarCodigos(Request $request)
+    {
+        $empreendedor = Empreendedor::where('user_id', Auth::id())->firstOrFail();
+
+        return response()->json(
+            CodigoTroca::where('empreendedor_id', $empreendedor->id)
+                ->latest()
+                ->get()
+        );
+    }
+
+    public function usarCodigo(Request $request)
+    {
+        $request->validate([
+            'codigo' => 'required|string|max:12',
+        ]);
+
+        $codigo = CodigoTroca::where('codigo', strtoupper(trim($request->codigo)))
+            ->where('status', 'disponivel')
+            ->first();
+
+        if (!$codigo) {
+            return response()->json([
+                'message' => 'Código inválido ou já utilizado.'
+            ], 422);
+        }
+
+        $codigo->update([
+            'status' => 'utilizado',
+            'user_id' => Auth::id(),
+            'utilizado_em' => now(),
+        ]);
+
+        return response()->json([
+            'message' => 'Código utilizado com sucesso!',
+            'codigo' => $codigo->codigo,
+            'empreendedor_id' => $codigo->empreendedor_id,
         ]);
     }
 

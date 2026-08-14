@@ -6,22 +6,17 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('categories', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+        Schema::table('codigos_troca', function (Blueprint $table) {
+            $table->unsignedInteger('moedas')->default(1)->after('codigo');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('categories');
+        Schema::table('codigos_troca', function (Blueprint $table) {
+            $table->dropColumn('moedas');
+        });
     }
 };

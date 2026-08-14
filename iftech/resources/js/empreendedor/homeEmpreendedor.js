@@ -128,7 +128,7 @@ if (loginForm) {
         }
 
         try {
-            const res = await fetch("/api/login", {
+            const res = await fetch("/api/login-empreendedor", {
                 method: "POST",
                 headers: { "Content-Type": "application/json", "Accept": "application/json" },
                 body: JSON.stringify({
@@ -140,16 +140,20 @@ if (loginForm) {
             const data = await res.json();
             if (!res.ok) throw new Error(data.message || "Erro ao entrar");
 
+            if (data.user?.role !== "empreendedor") {
+                throw new Error("Esta conta não é uma conta de empreendedor.");
+            }
+
             localStorage.setItem("auth_token", data.token);
-            alert("Login realizado com sucesso!");
-            
-            const emailDigitado = document.getElementById("login_email").value;
-            window.location.href = '/empreendedor/controle?email=' + emailDigitado;
+            localStorage.setItem("token", data.token);
+            localStorage.setItem("user", JSON.stringify(data.user));
+            window.location.href = "/logado-empreendedor";
             
         } catch (err) {
             alert("Erro: " + err.message);
         }
     });
 }
+
 
 });

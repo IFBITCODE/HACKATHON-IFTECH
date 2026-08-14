@@ -152,7 +152,7 @@
 
             try {
 
-                const response = await fetch('/api/login', {
+                const response = await fetch('/api/login-prefeitura', {
                     method: 'POST',
 
                     headers: {

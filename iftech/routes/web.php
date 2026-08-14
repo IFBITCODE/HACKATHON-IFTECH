@@ -39,6 +39,12 @@ Route::get('/login-empreendedor', function () {
     return view('empreendedor.homeEmpreendedor');
 })->name('login');
 
+
+// Logout da sessão web
+Route::post('/logout', [\App\Http\Controllers\AuthController::class, 'logout'])
+    ->middleware('auth')
+    ->name('logout');
+
 // Painel do empreendedor (Atalho / Rota Legada) — agora exige login
 Route::get('/empreendedor/controle', [EmpreendedorController::class, 'painel'])
     ->middleware('auth');
@@ -47,6 +53,13 @@ Route::get('/empreendedor/controle', [EmpreendedorController::class, 'painel'])
 Route::get('/logado-empreendedor', [EmpreendedorController::class, 'painel'])
     ->middleware('auth')
     ->name('empreendedor.painel');
+
+// Códigos de troca do empreendedor
+Route::middleware('auth')->group(function () {
+    Route::get('/empreendedor/codigos', [EmpreendedorController::class, 'listarCodigos']);
+    Route::post('/empreendedor/codigos/gerar', [EmpreendedorController::class, 'gerarCodigo']);
+    Route::post('/usuario/codigos/usar', [EmpreendedorController::class, 'usarCodigo']);
+});
 
 /*
 | CHATBOT / GUIA TURÍSTICO

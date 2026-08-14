@@ -154,7 +154,7 @@
     <script>
 
         // Assim que a tela abrir, ele chama a função para buscar os dados
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('token') || localStorage.getItem('auth_token');
 
         if (!token) {
             window.location.href = '/login-prefeitura';
@@ -193,7 +193,7 @@
 
             try {
                 // Chama a sua rota GET do PrefeituraController
-                const token = localStorage.getItem('token');
+                const token = localStorage.getItem('token') || localStorage.getItem('auth_token');
 
                 const resposta = await fetch('/api/prefeitura/empreendedores/pendentes', {
                     method: 'GET',
@@ -204,6 +204,16 @@
                 });
 
                 const empreendedores = await resposta.json();
+
+                if (!resposta.ok) {
+                    if (resposta.status === 401 || resposta.status === 403) {
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('auth_token');
+                        window.location.href = '/login-prefeitura';
+                        return;
+                    }
+                    throw new Error(empreendedores.message || 'Não foi possível carregar as solicitações.');
+                }
 
                 tbody.innerHTML = '';
 
@@ -238,7 +248,7 @@
 
             try {
                 // Dispara o PATCH para a sua rota de aprovação
-                const token = localStorage.getItem('token');
+                const token = localStorage.getItem('token') || localStorage.getItem('auth_token');
 
                 const resposta = await fetch(`/api/prefeitura/empreendedores/${id}/aprovar`, {
                     method: 'PATCH',
@@ -268,7 +278,7 @@
 
             try {
                 // Dispara o PATCH enviando o motivo no 'body'
-                const token = localStorage.getItem('token');
+                const token = localStorage.getItem('token') || localStorage.getItem('auth_token');
 
                 const resposta = await fetch(`/api/prefeitura/empreendedores/${id}/rejeitar`, {
                     method: 'PATCH',
