@@ -31,7 +31,7 @@ html, body, .landing-page {
     align-items: center;
     width: 100%;
     max-width: 680px;
-    margin-top: -160px; /* Eleva o bloco do título e busca */
+    margin-top: -180px; /* Eleva o bloco do título e busca */
 }
 
 /* Estilo do Título */
@@ -58,6 +58,7 @@ html, body, .landing-page {
 /* Container de Busca */
 .search-container {
     width: 100%;
+    margin-top: -40px;
 }
 
 .search-box {
@@ -138,4 +139,125 @@ html, body, .landing-page {
         height: 42px;
         padding: 0 16px;
     }
+}
+
+.chat-messages {
+    width: 100%;
+    margin-top: 18px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    animation: chatAppear 0.3s ease;
+}
+
+
+/* Mensagem individual */
+
+.message {
+    width: fit-content;
+    max-width: 85%;
+
+    padding: 12px 16px;
+
+    border-radius: 14px;
+
+    font-size: 0.95rem;
+
+    line-height: 1.5;
+
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+
+/* Mensagem do usuário */
+
+.user-message {
+    align-self: flex-end;
+
+    background-color: #ffffff;
+
+    color: #202124;
+
+    border-bottom-right-radius: 4px;
+}
+
+
+/* Resposta do chatbot */
+
+.bot-message {
+    align-self: flex-start;
+
+    background-color: #111e28;
+
+    color: #ffffff;
+
+    border-bottom-left-radius: 4px;
+}
+
+
+/* Nome "Você" / "RotaGuiada" */
+
+.message-label {
+    font-size: 0.72rem;
+
+    font-weight: 700;
+
+    margin-bottom: 4px;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.5px;
+}
+
+
+/* Nome do bot amarelo */
+
+.bot-message .message-label {
+    color: #fbbc05;
+}
+
+
+/* Texto */
+
+.message-text {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+
+/* Animação */
+
+@keyframes chatAppear {
+
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+}
+
+
+/* ==========================================
+   RESPONSIVO
+   ========================================== */
+
+@media (max-width: 600px) {
+
+    .chat-messages {
+        margin-top: 12px;
+    }
+
+    .message {
+        max-width: 90%;
+        font-size: 0.9rem;
+        padding: 10px 13px;
+    }
+
 }

@@ -6,50 +6,56 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OccurrenceController;
 
 
-//rota da pagina principal do usuario/turista 
+// PÁGINA PRINCIPAL DO USUÁRIO / TURISTA
+
 Route::get('/', function () {
     return view('usuario.HomeUsuario');
 });
 
 
-// rota da pagina principal da prefeitura
+// PÁGINA PRINCIPAL DA PREFEITURA
+
 Route::get('/prefeitura', function () {
     return view('prefeitura.homePrefeitura');
 });
 
-//rota da pagina principal do empreendedor
+
+// PÁGINA PRINCIPAL DO EMPREENDEDOR
+
 Route::get('/empreendedor', function () {
     return view('empreendedor.homeEmpreendedor');
 });
 
 
+// CHATBOT
 
-Route::get('/chat', function () {
-    return view('chat');
-});
-
-// Rota para abrir a página do chat (Método GET)
+// Abrir o chat, caso você queira acessar /chat diretamente
 Route::get('/chat', [ChatbotController::class, 'index']);
 
-// Rota para quando o usuário clicar em "Enviar" a mensagem (Método POST)
+// Enviar mensagem para o chatbot
 Route::post('/chat', [ChatbotController::class, 'responder']);
 
-Route::get('/diagnostico', [ChatbotController::class, 'diagnostico']);
+
+// DIAGNÓSTICO
 
 Route::get('/diagnostico', [ChatbotController::class, 'diagnostico']);
+
+
+// EMPREENDEDOR LOGADO
 
 Route::get('/logadoempreendedor', function () {
     return view('empreendedor.controleEmpreendedor');
 });
 
 
+// ADMIN
 Route::get(
     '/admin/dashboard',
     [DashboardController::class, 'index']
 )->name('admin.dashboard');
 
+
 Route::resource(
     '/admin/occurrences',
     OccurrenceController::class
 )->names('admin.occurrences');
-

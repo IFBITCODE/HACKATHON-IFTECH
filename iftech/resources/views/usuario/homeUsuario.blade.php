@@ -44,20 +44,89 @@
             </div>
 
             <!-- Container da Busca (Sem lupa + Botão Amarelo) -->
-            <div class="search-container">
-                    <div class="search-box">
-                        <input type="text" placeholder="Digite sua pesquisa...">
-                        <button type="submit" class="search-button">
-                            <!-- Ícone de busca (SVG ou texto) -->
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#202124" stroke-width="2.5">
-                                <circle cx="11" cy="11" r="8"></circle>
-                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                            </svg>
-                        </button>
-                    </div>
+<!-- Container da Busca / Chat -->
+<div class="search-container">
+
+    <form action="{{ url('/chat') }}" method="POST" class="search-box">
+
+        @csrf
+
+        <input
+            id="searchInput"
+            type="text"
+            name="mensagem"
+            placeholder="Digite sua pesquisa..."
+            autocomplete="off"
+            required
+        >
+
+        <button
+            type="submit"
+            id="searchButton"
+            class="search-button"
+        >
+            <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#202124"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line
+                    x1="21"
+                    y1="21"
+                    x2="16.65"
+                    y2="16.65"
+                ></line>
+            </svg>
+        </button>
+
+    </form>
+
+
+    <!-- MENSAGENS DO CHAT -->
+    @if(isset($resposta))
+
+        <div class="chat-messages">
+
+            <!-- Mensagem do usuário -->
+            <div class="message user-message">
+
+                <div class="message-label">
+                    Você
+                </div>
+
+                <div class="message-text">
+                    {{ $mensagemUser }}
                 </div>
 
             </div>
+
+
+            <!-- Resposta do chatbot -->
+            <div class="message bot-message">
+
+                <div class="message-label">
+                    RotaGuiada
+                </div>
+
+                <div class="message-text">
+                    {{ $resposta }}
+                </div>
+
+            </div>
+
+        </div>
+
+    @endif
+
+</div>
+
+        </div>
 
     </section>
 </main>
