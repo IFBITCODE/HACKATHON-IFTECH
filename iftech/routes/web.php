@@ -9,9 +9,12 @@ use App\Http\Controllers\OccurrenceController;
 // PÁGINA PRINCIPAL DO USUÁRIO / TURISTA
 
 Route::get('/', function () {
-    return view('usuario.HomeUsuario');
+    return view('HomeUsuario');
 });
 
+// Rota para abrir a página de login da prefeitura
+Route::get('/login-prefeitura', function(){
+    return view('prefeitura.login');
 
 // PÁGINA PRINCIPAL DA PREFEITURA
 
