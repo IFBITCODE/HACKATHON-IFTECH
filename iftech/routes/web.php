@@ -36,6 +36,13 @@ Route::post('/chat', [ChatbotController::class, 'responder']);
 
 Route::get('/diagnostico', [ChatbotController::class, 'diagnostico']);
 
+Route::get('/diagnostico', [ChatbotController::class, 'diagnostico']);
+
+Route::get('/empreendedor', function () {
+    return view('empreendedor.controleEmpreendedor');
+});
+
+
 Route::get(
     '/admin/dashboard',
     [DashboardController::class, 'index']
@@ -45,3 +52,4 @@ Route::resource(
     '/admin/occurrences',
     OccurrenceController::class
 )->names('admin.occurrences');
+
