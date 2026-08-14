@@ -18,7 +18,7 @@ Route::get('/prefeitura', function () {
 });
 
 //rota da pagina principal do empreendedor
-Route::get('/empreededor', function () {
+Route::get('/empreendedor', function () {
     return view('empreendedor.homeEmpreendedor');
 });
 
@@ -38,7 +38,7 @@ Route::get('/diagnostico', [ChatbotController::class, 'diagnostico']);
 
 Route::get('/diagnostico', [ChatbotController::class, 'diagnostico']);
 
-Route::get('/empreendedor', function () {
+Route::get('/logadoempreendedor', function () {
     return view('empreendedor.controleEmpreendedor');
 });
 
