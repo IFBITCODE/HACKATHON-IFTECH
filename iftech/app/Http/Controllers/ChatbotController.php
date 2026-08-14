@@ -8,7 +8,6 @@ use App\Models\Empreendedor;
 
 class ChatbotController extends Controller
 {
-    // 1. Abre a tela inicial de busca (homeUsuario)
     public function index() {
         return view('usuario.homeUsuario', [
             'resposta' => null,
@@ -16,36 +15,38 @@ class ChatbotController extends Controller
         ]);
     }
 
-    // 2. Processa a pesquisa e retorna mantendo a mesma página
     public function responder(Request $request) {
         $mensagemUser = $request->input('mensagem'); 
         $apiKey = env('GEMINI_API_KEY');
 
-        // 1. Busca no banco de dados apenas as empresas aprovadas pela prefeitura
+        // 1. Busca parceiros aprovados no Supabase
         $parceirosAprovados = Empreendedor::where('status', 'aprovado')->get();
         
-        // 2. Transforma os dados do banco em um texto que a IA consiga ler
+        // 2. Passa os dados para a IA, incluindo a quantidade de moedas que o local oferece
         $textoParceiros = "";
         if ($parceirosAprovados->count() > 0) {
             foreach ($parceirosAprovados as $parceiro) {
-                $textoParceiros .= "- Nome: {$parceiro->nome_fantasia} | Cidade: {$parceiro->cidade} | Descrição: {$parceiro->descricao}\n";
+                // Pega a quantidade de moedas (se não existir a coluna ou valor, assume 50)
+                $moedas = $parceiro->bonus_moedas ?? 50; 
+                $textoParceiros .= "- Nome: {$parceiro->nome_fantasia} | Cidade: {$parceiro->cidade} | Recompensa ao visitar: {$moedas} moedas | Descrição: {$parceiro->descricao}\n";
             }
         } else {
             $textoParceiros = "Ainda não temos parceiros cadastrados nesta região.";
         }
 
-        // 3. O "Cérebro" da IA com regras de Gamificação e Escopo Flexível
+        // 3. O "Cérebro" da IA com regras estritas de gamificação
         $mensagemParaIA = "Você é um assistente virtual de turismo criado para o Hackathon IFTECH.
         
-        NOSSOS PARCEIROS OFICIAIS CADASTRADOS:
+        NOSSOS PARCEIROS OFICIAIS CADASTRADOS E SUAS RECOMPENSAS:
         {$textoParceiros}
 
         REGRAS DE FUNCIONAMENTO:
-        1. ESCOPO: Você deve falar APENAS sobre turismo, gastronomia, hospedagem e passeios na região (como, por exemplo, opções em Campina Grande e arredores). Se o usuário perguntar algo totalmente fora desse universo (como matemática, programação, consertos, etc.), recuse dizendo: 'Desculpe, meu conhecimento é limitado apenas ao turismo municipal.'
-        2. RECOMENDAÇÕES (PRIORIDADE): Se o usuário pedir dicas de onde ir (comer, dormir, passear), primeiro verifique se há algum estabelecimento na lista de 'NOSSOS PARCEIROS OFICIAIS' que atenda ao pedido.
-           - Se houver: Recomende-o e adicione OBRIGATORIAMENTE a frase exata: 'se voce for nesse que é nosso parceiro voce pode ganhar algumas moedas de troca'. Em seguida, dê mais 1 opção de conhecimento geral para dar variedade.
-        3. SEM PARCEIROS: Se o usuário pedir algo (ex: restaurante) e a lista de parceiros não tiver nenhum restaurante cadastrado, não bloqueie a conversa. Apenas recomende 2 lugares reais e legais da cidade usando seu conhecimento geral.
-        4. TAMANHO: Seja amigável, direto ao ponto (máximo 2 parágrafos) e responda em pt-BR.
+        1. ESCOPO: Fale APENAS sobre turismo, gastronomia, hospedagem e passeios na região. Recuse educadamente outros assuntos.
+        2. RECOMENDAÇÕES: Priorize recomendar os estabelecimentos da lista de 'NOSSOS PARCEIROS OFICIAIS'.
+        3. AVISO DE MOEDAS (OBRIGATÓRIO): Sempre que você sugerir um dos nossos parceiros oficiais, você DEVE informar a quantidade exata de moedas que ele oferece. 
+           - NUNCA use frases genéricas como 'você ganha moedas de troca'.
+           - USE SEMPRE o formato: 'Visitando este local, você ganha X moedas de troca!', substituindo a letra X pelo número exato de moedas informado na lista acima para aquele parceiro.
+        4. TAMANHO: Seja amigável e direto ao ponto (máximo de 2 parágrafos).
 
         Mensagem do usuário: " . $mensagemUser;
 
@@ -57,21 +58,17 @@ class ChatbotController extends Controller
                 'X-goog-api-key' => $apiKey,
             ])->post($url, [
                 'contents' => [
-                    [
-                        'parts' => [
-                            ['text' => $mensagemParaIA]
-                        ]
-                    ]
+                    ['parts' => [['text' => $mensagemParaIA]]]
                 ]
             ]);
 
             if ($respostaAPI->successful()) {
                 $dados = $respostaAPI->json();
+                // Pega o texto puro da resposta
                 $respostaBot = $dados['candidates'][0]['content']['parts'][0]['text'] ?? 'Sem resposta da IA.';
             } else {
                 $erroDoGoogle = $respostaAPI->json();
-                $mensagemDeErro = $erroDoGoogle['error']['message'] ?? 'Erro desconhecido na API';
-                $respostaBot = "Aviso da API: " . $mensagemDeErro;
+                $respostaBot = "Aviso da API: " . ($erroDoGoogle['error']['message'] ?? 'Erro desconhecido');
             }
 
         } catch (\Exception $e) {
@@ -86,8 +83,7 @@ class ChatbotController extends Controller
             ]);
         }
 
-        // SE O NAVEGADOR RECARREGAR (SUBMIT TRADICIONAL)
-        // Retorna a view correta da sua home com os resultados inseridos abaixo da busca
+        // SE O NAVEGADOR RECARREGAR
         return view('usuario.homeUsuario', [
             'resposta' => $respostaBot,
             'mensagemUser' => $mensagemUser
