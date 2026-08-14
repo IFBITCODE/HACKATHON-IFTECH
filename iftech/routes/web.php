@@ -22,7 +22,7 @@ Route::get('/', function () {
 */
 // Página de login da prefeitura
 Route::get('/login-prefeitura', function () {
-    return view('prefeitura.login');
+    return view('prefeitura.loginPrefeitura.login');
 });
 
 // Página principal da prefeitura
