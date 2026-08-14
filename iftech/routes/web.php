@@ -13,7 +13,7 @@ use App\Http\Controllers\PrefeituraDashboardController;
 
 // Página principal do usuário/turista
 Route::get('/', function () {
-    return view('HomeUsuario');
+    return view('usuario.HomeUsuario');
 });
 
 // ==========================================
