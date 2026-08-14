@@ -78,10 +78,12 @@ Route::get('/logado-empreendedor', [EmpreendedorController::class, 'painel'])
     ->middleware('auth')
     ->name('empreendedor.painel');
 
-// Códigos de troca do empreendedor
+// Códigos de troca do empreendedor (Sistema de Cupom Único)
 Route::middleware('auth')->group(function () {
-    Route::get('/empreendedor/codigos', [EmpreendedorController::class, 'listarCodigos']);
-    Route::post('/empreendedor/codigos/gerar', [EmpreendedorController::class, 'gerarCodigo']);
+    // Nova rota para o empreendedor ativar/desativar e mudar o valor do seu cupom
+    Route::post('/empreendedor/cupom/salvar', [EmpreendedorController::class, 'salvarCupomUnico']);
+    
+    // Rota mantida para o turista poder resgatar o código depois
     Route::post('/usuario/codigos/usar', [EmpreendedorController::class, 'usarCodigo']);
 });
 

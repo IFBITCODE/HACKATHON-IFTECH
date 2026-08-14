@@ -109,61 +109,53 @@
                 </div>
             </div>
 
-            <div class="col-lg-5 mb-4">
-                <div class="card shadow-sm h-100 border-warning">
-                    <div class="card-header bg-warning text-dark py-3">
-                        <h5 class="mb-0">
-                            <i class="bi bi-upc-scan"></i> Código de Troca
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <p class="text-muted">
-                            Escolha quantas moedas o usuário receberá e gere um código para entregar a ele.
-                        </p>
-
-                        <div class="mb-3">
-                            <label for="quantidadeMoedas" class="form-label fw-bold">
-                                <i class="bi bi-coin"></i> Quantidade de moedas
-                            </label>
-                            <input type="number" id="quantidadeMoedas" class="form-control" min="1" max="10000" value="1" required>
-                            <small class="text-muted">Escolha de 1 a 10.000 moedas.</small>
+                <!-- COLUNA DIREITA: GESTÃO DO CUPOM ÚNICO -->
+                <div class="col-lg-5 mb-4">
+                    <div class="card shadow-sm h-100 border-warning">
+                        <div class="card-header bg-warning text-dark py-3">
+                            <h5 class="mb-0">
+                                <i class="bi bi-upc-scan"></i> Configuração do Cupom
+                            </h5>
                         </div>
+                        <div class="card-body">
+                            <p class="text-muted">
+                                Defina o valor da recompensa do seu estabelecimento e ative/desative o cupom quando desejar.
+                            </p>
 
-                        <button type="button" id="btnGerarCodigo" class="btn btn-warning w-100 fw-bold mb-3">
-                            <i class="bi bi-plus-circle"></i> Gerar novo código
-                        </button>
+                            <!-- Pega o primeiro cupom se existir -->
+                            @php
+                                $cupomAtual = $codigos->first(); 
+                            @endphp
 
-                        <div id="codigoGeradoBox" class="codigo-box mb-4" style="display:none;">
-                            <small class="text-muted d-block mb-2">NOVO CÓDIGO</small>
-                            <div id="codigoGerado" class="codigo-principal">---</div>
-                            <div id="moedasGeradas" class="mt-2 fw-bold text-warning">0 moedas</div>
-                            <button type="button" id="btnCopiarCodigo" class="btn btn-outline-dark btn-sm mt-3">
-                                <i class="bi bi-copy"></i> Copiar código
-                            </button>
-                        </div>
-
-                        <h6 class="mb-3">Códigos gerados</h6>
-                        <div id="listaCodigos">
-                            @forelse($codigos as $codigo)
-                                <div class="codigo-item d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <strong>{{ $codigo->codigo }}</strong>
-                                        <br>
-                                        <small class="text-muted">
-                                            {{ $codigo->created_at->format('d/m/Y H:i') }}
-                                        </small>
+                            <div class="mb-4">
+                                <label class="form-label fw-bold text-dark">Código do Cupom Físico</label>
+                                <div class="codigo-box p-3">
+                                    <div id="codigoGerado" class="codigo-principal">
+                                        {{ $cupomAtual ? $cupomAtual->codigo : 'NENHUM-CÓDIGO' }}
                                     </div>
-                                    @if($codigo->status === 'utilizado')
-                                        <span class="badge bg-secondary">Utilizado</span>
-                                    @else
-                                        <span class="badge bg-success">Disponível</span>
-                                    @endif
+                                    <small class="text-muted">Este é o código que os turistas irão digitar.</small>
                                 </div>
-                            @empty
-                                <p id="semCodigos" class="text-muted text-center">
-                                    Nenhum código gerado ainda.
-                                </p>
-                            @endforelse
+                            </div>
+
+                            <form id="formCupomUnico">
+                                <div class="mb-3">
+                                    <label for="quantidadeMoedas" class="form-label fw-bold">
+                                        <i class="bi bi-coin"></i> Moedas de Recompensa
+                                    </label>
+                                    <input type="number" id="quantidadeMoedas" class="form-control" min="1" max="10000" value="{{ $cupomAtual ? $cupomAtual->moedas : 50 }}" required>
+                                </div>
+
+                                <div class="form-check form-switch mb-4 fs-5">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="statusCupom" {{ ($cupomAtual && $cupomAtual->status === 'disponivel') ? 'checked' : '' }}>
+                                    <label class="form-check-label fw-bold" for="statusCupom" id="labelStatusCupom">
+                                        {{ ($cupomAtual && $cupomAtual->status === 'disponivel') ? 'Cupom Ativado' : 'Cupom Desativado' }}
+                                    </label>
+                                </div>
+
+                                <button type="button" id="btnSalvarCupom" class="btn btn-warning w-100 fw-bold fs-5">
+                                    <i class="bi bi-save"></i> Salvar Alterações
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -217,59 +209,68 @@ btnLogout?.addEventListener('click', async () => {
     }
 });
 
-const btnGerarCodigo = document.getElementById('btnGerarCodigo');
-const quantidadeMoedas = document.getElementById('quantidadeMoedas');
-const codigoGeradoBox = document.getElementById('codigoGeradoBox');
-const moedasGeradas = document.getElementById('moedasGeradas');
-const codigoGerado = document.getElementById('codigoGerado');
-const btnCopiarCodigo = document.getElementById('btnCopiarCodigo');
-const listaCodigos = document.getElementById('listaCodigos');
-const totalCodigos = document.getElementById('totalCodigos');
+// Script do botão de Logout continua igual...
 
-btnGerarCodigo?.addEventListener('click', async () => {
-    const textoOriginal = btnGerarCodigo.innerHTML;
+const btnSalvarCupom = document.getElementById('btnSalvarCupom');
+const quantidadeMoedas = document.getElementById('quantidadeMoedas');
+const statusCupom = document.getElementById('statusCupom');
+const labelStatusCupom = document.getElementById('labelStatusCupom');
+const codigoGerado = document.getElementById('codigoGerado');
+
+// Muda o texto do label na hora que clica no interruptor
+statusCupom?.addEventListener('change', function() {
+    labelStatusCupom.textContent = this.checked ? 'Cupom Ativado' : 'Cupom Desativado';
+});
+
+btnSalvarCupom?.addEventListener('click', async () => {
+    const textoOriginal = btnSalvarCupom.innerHTML;
 
     try {
-        btnGerarCodigo.disabled = true;
-        btnGerarCodigo.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Gerando...';
+        btnSalvarCupom.disabled = true;
+        btnSalvarCupom.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Salvando...';
 
         const moedas = Number(quantidadeMoedas.value);
+        const ativo = statusCupom.checked;
 
-        if (!Number.isInteger(moedas) || moedas < 1 || moedas > 10000) {
-            alert('Informe uma quantidade de moedas entre 1 e 10.000.');
-            quantidadeMoedas.focus();
+        if (!Number.isInteger(moedas) || moedas < 1) {
+            alert('Informe uma quantidade válida de moedas.');
             return;
         }
 
-        const response = await fetch('/empreendedor/codigos/gerar', {
+        // Nova rota para salvar/atualizar o cupom único
+        const response = await fetch('/empreendedor/cupom/salvar', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': csrfToken
             },
-            body: JSON.stringify({ moedas: moedas })
+            body: JSON.stringify({ moedas: moedas, ativo: ativo })
         });
 
         const data = await response.json();
 
         if (!response.ok) {
-            throw new Error(data.message || 'Não foi possível gerar o código.');
+            throw new Error(data.message || 'Erro ao salvar o cupom.');
         }
 
+        // Atualiza o código na tela caso tenha sido gerado pela primeira vez
         codigoGerado.textContent = data.codigo;
-        moedasGeradas.textContent = `${data.moedas} ${data.moedas === 1 ? 'moeda' : 'moedas'}`;
-        codigoGeradoBox.style.display = 'block';
-
-        alert('Código gerado com sucesso!\n\nCódigo: ' + data.codigo + '\nMoedas: ' + data.moedas);
-
-        carregarCodigos();
+        
+        // Dá um feedback visual legal para o usuário
+        btnSalvarCupom.classList.replace('btn-warning', 'btn-success');
+        btnSalvarCupom.innerHTML = '<i class="bi bi-check-lg"></i> Salvo com sucesso!';
+        
+        setTimeout(() => {
+            btnSalvarCupom.classList.replace('btn-success', 'btn-warning');
+            btnSalvarCupom.innerHTML = textoOriginal;
+        }, 2000);
 
     } catch (error) {
         alert(error.message);
+        btnSalvarCupom.innerHTML = textoOriginal;
     } finally {
-        btnGerarCodigo.disabled = false;
-        btnGerarCodigo.innerHTML = textoOriginal;
+        btnSalvarCupom.disabled = false;
     }
 });
 

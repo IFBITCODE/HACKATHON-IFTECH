@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
+
+
 class EmpreendedorController extends Controller
 {
     public function index(Request $request)
@@ -204,6 +206,44 @@ class EmpreendedorController extends Controller
             'empreendedor_id' => $codigo->empreendedor_id,
         ]);
     }
+
+    public function salvarCupomUnico(Request $request)
+{
+    $request->validate([
+        'moedas' => 'required|integer|min:1',
+        'ativo' => 'required|boolean'
+    ]);
+
+    // Pega o usuário logado e o empreendedor vinculado a ele
+    $user = \Illuminate\Support\Facades\Auth::user();
+    $empreendedor = Empreendedor::where('user_id', $user->id)->first();
+
+    if (!$empreendedor) {
+        return response()->json(['message' => 'Empreendedor não encontrado.'], 404);
+    }
+
+    // Busca o cupom dessa empresa. Se não achar, prepara para criar um novo.
+    $cupom = CodigoTroca::firstOrNew(['empreendedor_id' => $empreendedor->id]);
+
+    // Se o cupom for novo (não existir no banco), gera um código aleatório
+    if (!$cupom->exists) {
+        $cupom->codigo = 'RTG-' . strtoupper(Str::random(6)); // Ex: RTG-A1B2C3
+    }
+
+    // Atualiza os valores
+    $cupom->moedas = $request->moedas;
+    $cupom->status = $request->ativo ? 'disponivel' : 'inativo'; // 'inativo' significa que o bot não vai enxergar
+    
+    // Salva no Supabase
+    $cupom->save();
+
+    return response()->json([
+        'message' => 'Cupom salvo com sucesso!',
+        'codigo' => $cupom->codigo,
+        'moedas' => $cupom->moedas,
+        'status' => $cupom->status
+    ]);
+}
 
     public function destroy($id)
     {
