@@ -22,20 +22,44 @@
             <a class="navbar-brand" href="#"><i class="bi bi-shop"></i> Portal do Empreendedor - Turismo PB</a>
             <div class="d-flex text-white align-items-center">
                 <i class="bi bi-person-circle fs-4 me-2"></i>
-                <span>Minha Empresa</span>
+                <span>{{ $empreendedor->nome_fantasia }}</span>
             </div>
         </div>
     </nav>
 
     <div class="container">
         
-        <!-- ALERTA DE STATUS -->
-        <div class="alert alert-success d-flex align-items-center shadow-sm" role="alert">
-            <i class="bi bi-check-circle-fill fs-4 me-3"></i>
-            <div>
-                <strong>Status: Aprovado!</strong> Seu estabelecimento está visível para os turistas e sendo recomendado pela nossa Inteligência Artificial.
-            </div>
+        <!-- PAINEL DE MÉTRICAS -->
+        <div class="row mb-4">
+            <!-- (Mantenha os cards de métricas aqui para eles verem o painel bonito) -->
+            ... 
         </div>
+
+        <!-- AQUI COMEÇA O BLOQUEIO VISUAL -->
+        @if($empreendedor->status == 'aprovado')
+            
+            <!-- SÓ MOSTRA SE ESTIVER APROVADO -->
+            <div class="row">
+                <!-- COLUNA ESQUERDA: PERFIL DO ESTABELECIMENTO -->
+                ... 
+                <!-- COLUNA DIREITA: GESTÃO DE CUPONS E MOEDAS -->
+                ... 
+            </div>
+
+        @else
+            
+            <!-- TELA DE BLOQUEIO PARA QUEM ESTÁ PENDENTE/REJEITADO -->
+            <div class="row mt-5">
+                <div class="col-12 text-center p-5 bg-white rounded shadow-sm">
+                    <i class="bi bi-lock-fill text-warning" style="font-size: 5rem;"></i>
+                    <h3 class="mt-4 text-dark">Funcionalidades Bloqueadas</h3>
+                    <p class="text-muted fs-5">
+                        Assim que a Prefeitura validar e aprovar seus dados, você poderá editar seu perfil, preencher informações de acessibilidade e criar cupons de ofertas para os turistas.
+                    </p>
+                </div>
+            </div>
+
+        @endif
 
         <!-- PAINEL DE MÉTRICAS -->
         <div class="row mb-4">
@@ -70,7 +94,7 @@
                             <div class="row mb-3">
                                 <div class="col-md-12">
                                     <label class="form-label">Nome Fantasia</label>
-                                    <input type="text" class="form-control" value="Pousada Paraíba Tur">
+                                    <input type="text" class="form-control" value="{{ $empreendedor->nome_fantasia }}">
                                 </div>
                             </div>
                             <div class="row mb-3">

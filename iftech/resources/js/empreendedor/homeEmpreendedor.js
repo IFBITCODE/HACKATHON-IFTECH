@@ -118,7 +118,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // --- ENVIO DO FORMULÁRIO DE LOGIN ---
     const loginForm = document.getElementById("loginForm");
-    if (loginForm) {
+if (loginForm) {
     loginForm.addEventListener("submit", async function (event) {
         event.preventDefault();
 
@@ -142,7 +142,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
             localStorage.setItem("auth_token", data.token);
             alert("Login realizado com sucesso!");
-
+            
+            const emailDigitado = document.getElementById("login_email").value;
+            window.location.href = '/empreendedor/controle?email=' + emailDigitado;
+            
         } catch (err) {
             alert("Erro: " + err.message);
         }

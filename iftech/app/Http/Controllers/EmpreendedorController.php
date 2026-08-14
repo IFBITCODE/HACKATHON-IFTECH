@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Empreendedor;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class EmpreendedorController extends Controller
 {
@@ -62,6 +63,13 @@ class EmpreendedorController extends Controller
     {
         $empreendedor = Empreendedor::findOrFail($id);
 
+        // NOVA TRAVA DE SEGURANÇA
+        if ($empreendedor->status !== 'aprovado') {
+            return response()->json([
+                'message' => 'Ação não permitida. Seu cadastro ainda não foi aprovado pelo município.'
+            ], 403);
+        }
+
         $dados = $request->validate([
             'nome_fantasia' => 'sometimes|string|max:255',
             'razao_social' => 'nullable|string|max:255',
@@ -98,6 +106,38 @@ class EmpreendedorController extends Controller
             'empreendedor' => $empreendedor,
         ]);
     }
+
+
+   public function painel(Request $request)
+    {
+        $email = $request->query('email');
+        $empreendedor = null;
+        
+        // 1. Tenta achar o usuário pelo e-mail vindo da URL
+        if ($email) {
+            $user = \App\Models\User::where('email', $email)->first();
+            if ($user) {
+                $empreendedor = \App\Models\Empreendedor::where('user_id', $user->id)->first();
+            }
+        } 
+        
+        // 2. FALLBACK HACKATHON: Se não achar o e-mail ou o usuário, 
+        // pega o último empreendedor cadastrado no banco de dados para a tela não quebrar.
+        if (!$empreendedor) {
+            $empreendedor = \App\Models\Empreendedor::latest()->first();
+        }
+
+        // 3. Previne erro 500 se o banco de dados estiver completamente vazio
+        if (!$empreendedor) {
+            return response('Nenhum empreendedor no banco de dados. Cadastre um primeiro!', 404);
+        }
+
+        // 4. Manda os dados para a view
+        return view('empreendedor.controleEmpreendedor', [
+            'empreendedor' => $empreendedor
+        ]);
+    }
+
 
     public function destroy($id)
     {

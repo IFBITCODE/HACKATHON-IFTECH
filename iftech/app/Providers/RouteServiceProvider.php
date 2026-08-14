@@ -1,0 +1,1 @@
+public const HOME = '/empreendedor/controle';

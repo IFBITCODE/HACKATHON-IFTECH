@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\User;
+use App\Models\Category; // <-- Adicione esta linha aqui
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
