@@ -8,10 +8,6 @@ use App\Http\Controllers\EmpreendedorController;
 use App\Http\Controllers\PrefeituraDashboardController;
 use App\Http\Controllers\AuthController;
 
-// ==========================================
-// ÁREA PÚBLICA / USUÁRIO
-// ==========================================
-
 // Página principal do usuário/turista
 Route::get('/', function () {
     return view('usuario.HomeUsuario');
@@ -19,6 +15,21 @@ Route::get('/', function () {
 // ==========================================
 // ÁREA DA PREFEITURA
 // ==========================================
+
+/*
+ LOGIN COM GOOGLE
+ */
+Route::get('/auth/google', [AuthController::class, 'redirectToGoogle'])
+    ->name('google.login');
+
+Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback'])
+    ->name('google.callback');
+
+
+/*
+| ÁREA DA PREFEITURA
+
+*/
 
 // Página de login da prefeitura
 Route::get('/login-prefeitura', function () {
