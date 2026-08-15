@@ -8,7 +8,6 @@
     <title>Rotaguiada | Turismo Inteligente</title>
 
     <link rel="stylesheet" href="https://vlibras.gov.br/app/vlibras-plugin.css">
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Restauração da Variável Global de Autenticação -->
@@ -23,9 +22,14 @@
 </head>
 
 <body>
+    <!-- MODAL DE LOGIN CORRIGIDO -->
     <div id="loginModal" class="login-modal">
         <div class="login-box">
             <button class="close-login" id="closeLogin">&times;</button>
+            
+            <div class="login-icon">
+                <i class="fa-solid fa-compass"></i>
+            </div>
             
             <h2>Entrar</h2>
             
@@ -54,7 +58,7 @@
                 <a href="#" id="registerFake">Cadastrar</a>
             </p>
             
-            <!-- Restauração da Div de Mensagem de Erro do Google -->
+            <!-- Mensagem de Erro do Google -->
             <div id="loginMessage">
                 @if(session('google_login_error'))
                     <div class="login-error" style="color: #dc3545; text-align: center; margin-top: 10px; font-weight: bold;">
@@ -88,7 +92,6 @@
                     <i class="fa-solid fa-coins"></i>
                     <div>
                         <span>Saldo atual</span>
-                        <!-- Restauração do Saldo Dinâmico do Banco de Dados -->
                         <strong id="coinsValue">{{ auth()->check() ? (auth()->user()->moedas ?? 0) : 0 }}</strong>
                         <small>moedas</small>
                     </div>
@@ -96,9 +99,7 @@
                 
                 <div class="code-section">
                     <h4>Resgatar moedas</h4>
-                    <p>
-                        Chegou no local? solicite seu código e digite abaixo para adicionar suas moedas.
-                    </p>
+                    <p>Chegou no local? solicite seu código e digite abaixo para adicionar suas moedas.</p>
                     
                     <form id="codeForm" class="code-form">
                         <input type="text" id="codeInput" placeholder="Ex: TURISMO100" autocomplete="off" required>
@@ -131,7 +132,6 @@
                 </div>
             </div>
             
-            <!-- Divisor com Ondas Suaves em Camadas -->
             <div class="mountain-divider">
                 <svg class="mountain-back" viewBox="0 0 1200 120" preserveAspectRatio="none">
                     <path d="M0,68 C80,48 150,48 220,64 C290,80 350,88 420,70 C500,48 550,42 620,60 C700,82 760,92 830,68 C900,44 960,42 1030,62 C1100,82 1150,78 1200,68 L1200,120 L0,120 Z"></path>
@@ -172,7 +172,7 @@
             const codeInput = document.getElementById('codeInput');
             const coinsValue = document.getElementById('coinsValue');
             const codeMessage = document.getElementById('codeMessage');
-            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
             codeForm?.addEventListener('submit', async (e) => {
                 e.preventDefault(); 
@@ -184,7 +184,6 @@
                 if (codigo.length < 5) return;
 
                 try {
-                    // Estado de carregamento
                     btnSubmit.disabled = true;
                     btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
                     codeMessage.innerHTML = ''; 
@@ -205,10 +204,8 @@
                         throw new Error(data.message || 'Código inválido ou já utilizado.');
                     }
 
-                    // Sucesso! Atualiza o número de moedas na tela
                     coinsValue.textContent = data.saldo_atual;
                     
-                    // Mostra mensagem verde de sucesso
                     codeInput.value = '';
                     codeMessage.innerHTML = `<div style="color: #28a745; margin-top: 10px; font-weight: bold; text-align: center;">
                         <i class="fa-solid fa-check-circle"></i> +${data.moedas_ganhas} moedas!
@@ -233,19 +230,14 @@
     <!-- VLibras -->
     <div vw class="enabled">
         <div vw-access-button class="active"></div>
-
         <div vw-plugin-wrapper>
             <div class="vw-plugin-top-wrapper"></div>
         </div>
     </div>
 
     <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
-
     <script>
-        new window.VLibras.Widget(
-            'https://vlibras.gov.br/app'
-        );
+        new window.VLibras.Widget('https://vlibras.gov.br/app');
     </script>
     <!-- Fim VLibras -->
 </body>
-</html>
