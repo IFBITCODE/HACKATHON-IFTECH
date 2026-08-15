@@ -88,6 +88,9 @@ Route::middleware('auth')->group(function () {
 // Abrir o chat
 Route::get('/chat', [ChatbotController::class, 'index']);
 
+// Envia a mensagem do usuário e retorna a resposta da IA
+Route::post('/chat', [ChatbotController::class, 'responder']);
+
 // Diagnóstico do chatbot
 Route::get('/diagnostico', [ChatbotController::class, 'diagnostico']);
 
