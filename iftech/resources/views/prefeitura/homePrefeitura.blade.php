@@ -139,7 +139,7 @@
                                         <th>ID</th>
                                         <th>Nome Fantasia</th>
                                         <th>CNPJ/CPF</th>
-                                        <th>Cidade/Localidade</th>
+                                        <th>Informações</th>
                                         <th>Status</th>
                                         <th>Ações</th>
                                     </tr>
@@ -156,6 +156,41 @@
             </div>
         </div>
 
+    </div>
+
+    <!-- Modal de informações do empreendedor -->
+    <div class="modal fade" id="modalInformacoes" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        📋 Informações do Empreendimento
+                    </h5>
+
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Fechar">
+                    </button>
+                </div>
+
+                <div class="modal-body" id="conteudoInformacoes">
+                    <!-- Os dados serão colocados aqui pelo JavaScript -->
+                </div>
+
+                <div class="modal-footer">
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+                        Fechar
+                    </button>
+                </div>
+
+            </div>
+        </div>
     </div>
 
     <script>
@@ -240,7 +275,14 @@
                             <td>#${emp.id}</td>
                             <td><strong>${emp.nome_fantasia}</strong></td>
                             <td>${emp.cpf_cnpj}</td>
-                            <td>${emp.cidade || 'Não informada'}</td>
+                            <td>
+                                <button
+                                    type="button"
+                                    class="btn btn-info btn-sm text-white"
+                                    onclick='mostrarInformacoes(${JSON.stringify(emp)})'>
+                                    👁 Ver informações
+                                </button>
+                            </td>
                             <td><span class="badge bg-warning text-dark">Pendente</span></td>
                             <td>
                                 <button onclick="aprovar(${emp.id})" class="btn btn-success btn-sm me-1">✔️ Aprovar</button>
@@ -312,6 +354,103 @@
                 alert('Ocorreu um erro ao tentar rejeitar.');
             }
         }
+        function mostrarInformacoes(emp) {
+            const conteudo = document.getElementById('conteudoInformacoes');
+
+            conteudo.innerHTML = `
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        <strong>Nome Fantasia:</strong>
+                        <p>${emp.nome_fantasia || 'Não informado'}</p>
+                    </div>
+
+                    <div class="col-md-6">
+                        <strong>Razão Social:</strong>
+                        <p>${emp.razao_social || 'Não informado'}</p>
+                    </div>
+
+                    <div class="col-md-6">
+                        <strong>CPF/CNPJ:</strong>
+                        <p>${emp.cpf_cnpj || 'Não informado'}</p>
+                    </div>
+
+                    <div class="col-md-6">
+                        <strong>E-mail:</strong>
+                        <p>${emp.email || 'Não informado'}</p>
+                    </div>
+
+                    <div class="col-md-6">
+                        <strong>Telefone:</strong>
+                        <p>${emp.telefone || 'Não informado'}</p>
+                    </div>
+
+                    <div class="col-md-6">
+                        <strong>WhatsApp:</strong>
+                        <p>${emp.whatsapp || 'Não informado'}</p>
+                    </div>
+
+                    <div class="col-12">
+                        <strong>Endereço:</strong>
+                        <p>
+                            ${emp.endereco || 'Não informado'}
+                            ${emp.bairro ? ' - ' + emp.bairro : ''}
+                        </p>
+                    </div>
+
+                    <div class="col-md-4">
+                        <strong>Cidade:</strong>
+                        <p>${emp.cidade || 'Não informado'}</p>
+                    </div>
+
+                    <div class="col-md-4">
+                        <strong>Estado:</strong>
+                        <p>${emp.estado || 'Não informado'}</p>
+                    </div>
+
+                    <div class="col-md-4">
+                        <strong>CEP:</strong>
+                        <p>${emp.cep || 'Não informado'}</p>
+                    </div>
+
+                    <div class="col-12">
+                        <strong>Descrição:</strong>
+                        <p>${emp.descricao || 'Não informado'}</p>
+                    </div>
+
+                    <div class="col-md-6">
+                        <strong>Horário de funcionamento:</strong>
+                        <p>${emp.horario_funcionamento || 'Não informado'}</p>
+                    </div>
+
+                    <div class="col-md-6">
+                        <strong>Acessibilidade:</strong>
+                        <p>
+                            ${emp.acessivel
+                                ? '✅ Empreendimento acessível'
+                                : '❌ Não informado como acessível'}
+                        </p>
+                    </div>
+
+                    <div class="col-12">
+                        <strong>Recursos de acessibilidade:</strong>
+                        <p>
+                            ${emp.recursos_acessibilidade || 'Não informado'}
+                        </p>
+                    </div>
+
+                </div>
+            `;
+
+            const modal = new bootstrap.Modal(
+                document.getElementById('modalInformacoes')
+            );
+
+            modal.show();
+        }
     </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
 </body>
 </html>
