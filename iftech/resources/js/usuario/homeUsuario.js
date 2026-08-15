@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-
     /*
     |--------------------------------------------------------------------------
     | BUSCA / GUIA TURÍSTICO
@@ -14,9 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const resultBody = document.getElementById("resultBody");
 
     if (searchForm && searchInput) {
-
         searchForm.addEventListener("submit", async (e) => {
-
             e.preventDefault();
 
             const mensagem = searchInput.value.trim();
@@ -37,80 +34,66 @@ document.addEventListener("DOMContentLoaded", () => {
             resultBody.innerHTML =
                 '<div class="loading-state">' +
                 '<i class="fa-solid fa-sparkles"></i> ' +
-                'Buscando os melhores locais para você...' +
-                '</div>';
+                "Buscando os melhores locais para você..." +
+                "</div>";
 
-            const tokenMeta = document.querySelector(
-                'meta[name="csrf-token"]'
-            );
+            const tokenMeta = document.querySelector('meta[name="csrf-token"]');
 
-            const token = tokenMeta
-                ? tokenMeta.getAttribute("content")
-                : "";
+            const token = tokenMeta ? tokenMeta.getAttribute("content") : "";
 
             try {
-
                 const response = await fetch(searchForm.action, {
                     method: "POST",
 
                     headers: {
                         "Content-Type": "application/json",
                         "X-CSRF-TOKEN": token,
-                        "Accept": "application/json",
-                        "X-Requested-With": "XMLHttpRequest"
+                        Accept: "application/json",
+                        "X-Requested-With": "XMLHttpRequest",
                     },
 
                     body: JSON.stringify({
-                        mensagem: mensagem
-                    })
+                        mensagem: mensagem,
+                    }),
                 });
 
                 const data = await response.json();
 
                 if (response.ok && data.resposta) {
-
-                    resultTag.textContent =
-                        "Sugestões de Turismo";
+                    resultTag.textContent = "Sugestões de Turismo";
 
                     const textoFormatado = data.resposta
                         .replace(/\n/g, "<br>")
                         .replace(
                             /(se voce for nesse que é nosso parceiro voce pode ganhar algumas moedas de troca)/gi,
                             '<span class="badge-parceiro">' +
-                            '<i class="fa-solid fa-coins"></i> $1' +
-                            '</span>'
+                                '<i class="fa-solid fa-coins"></i> $1' +
+                                "</span>",
                         );
 
                     resultBody.innerHTML = textoFormatado;
-
                 } else {
+                    resultTag.textContent = "Aviso do Sistema";
 
-                    resultTag.textContent =
-                        "Aviso do Sistema";
-
-                    resultBody.innerHTML =
-                        `<div class="error-msg">
-                            ${data.resposta ||
-                            data.erro ||
-                            "Não foi possível obter resposta no momento."}
+                    resultBody.innerHTML = `<div class="error-msg">
+                            ${
+                                data.resposta ||
+                                data.erro ||
+                                "Não foi possível obter resposta no momento."
+                            }
                         </div>`;
                 }
-
             } catch (error) {
-
                 console.error("Erro na busca:", error);
 
-                resultTag.textContent =
-                    "Erro de Conexão";
+                resultTag.textContent = "Erro de Conexão";
 
                 resultBody.innerHTML =
                     '<div class="error-msg">' +
-                    'Ocorreu um erro ao conectar ao servidor. ' +
-                    'Tente novamente.' +
-                    '</div>';
-
+                    "Ocorreu um erro ao conectar ao servidor. " +
+                    "Tente novamente." +
+                    "</div>";
             } finally {
-
                 searchButton.disabled = false;
 
                 searchButton.innerHTML =
@@ -118,12 +101,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 searchResult.scrollIntoView({
                     behavior: "smooth",
-                    block: "nearest"
+                    block: "nearest",
                 });
             }
         });
     }
-
 
     /*
     |--------------------------------------------------------------------------
@@ -138,7 +120,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const googleLogin = document.getElementById("googleLogin");
     const registerFake = document.getElementById("registerFake");
     const loginMessage = document.getElementById("loginMessage");
-
 
     /*
     |--------------------------------------------------------------------------
@@ -155,7 +136,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const codeInput = document.getElementById("codeInput");
     const codeMessage = document.getElementById("codeMessage");
 
-
     /*
     |--------------------------------------------------------------------------
     | CÓDIGOS DE MOEDAS
@@ -163,11 +143,10 @@ document.addEventListener("DOMContentLoaded", () => {
     */
 
     const codes = {
-        "TURISMO100": 100,
-        "ROTAPB50": 50,
-        "GUIA25": 25
+        TURISMO100: 100,
+        ROTAPB50: 50,
+        GUIA25: 25,
     };
-
 
     /*
     |--------------------------------------------------------------------------
@@ -186,7 +165,6 @@ document.addEventListener("DOMContentLoaded", () => {
         return window.authUser || null;
     }
 
-
     /*
     |--------------------------------------------------------------------------
     | ATUALIZA INTERFACE
@@ -194,11 +172,9 @@ document.addEventListener("DOMContentLoaded", () => {
     */
 
     function updateInterface() {
-
         const user = getUser();
 
         if (user) {
-
             loginBtn.textContent = "Sair";
 
             coinsBtn.style.display = "flex";
@@ -206,9 +182,7 @@ document.addEventListener("DOMContentLoaded", () => {
             coinsBtn.style.justifyContent = "center";
 
             coinsValue.textContent = user.moedas || 0;
-
         } else {
-
             loginBtn.textContent = "Entrar";
 
             coinsBtn.style.display = "none";
@@ -220,7 +194,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-
     /*
     |--------------------------------------------------------------------------
     | BOTÃO ENTRAR / SAIR
@@ -228,11 +201,9 @@ document.addEventListener("DOMContentLoaded", () => {
     */
 
     loginBtn.addEventListener("click", async (e) => {
-
         e.preventDefault();
 
         const user = getUser();
-
 
         /*
         |--------------------------------------------------------------------------
@@ -241,12 +212,10 @@ document.addEventListener("DOMContentLoaded", () => {
         */
 
         if (!user) {
-
             loginModal.classList.add("active");
 
             return;
         }
-
 
         /*
         |--------------------------------------------------------------------------
@@ -258,46 +227,29 @@ document.addEventListener("DOMContentLoaded", () => {
         */
 
         try {
+            const tokenMeta = document.querySelector('meta[name="csrf-token"]');
 
-            const tokenMeta = document.querySelector(
-                'meta[name="csrf-token"]'
-            );
-
-            const token = tokenMeta
-                ? tokenMeta.getAttribute("content")
-                : "";
+            const token = tokenMeta ? tokenMeta.getAttribute("content") : "";
 
             const response = await fetch("/logout", {
-
                 method: "POST",
 
                 headers: {
                     "X-CSRF-TOKEN": token,
-                    "Accept": "application/json",
-                    "X-Requested-With": "XMLHttpRequest"
-                }
+                    Accept: "application/json",
+                    "X-Requested-With": "XMLHttpRequest",
+                },
             });
 
             if (response.ok) {
-
                 window.location.reload();
-
             } else {
-
-                console.error(
-                    "Erro ao realizar logout."
-                );
+                console.error("Erro ao realizar logout.");
             }
-
         } catch (error) {
-
-            console.error(
-                "Erro no logout:",
-                error
-            );
+            console.error("Erro no logout:", error);
         }
     });
-
 
     /*
     |--------------------------------------------------------------------------
@@ -306,12 +258,10 @@ document.addEventListener("DOMContentLoaded", () => {
     */
 
     closeLogin.addEventListener("click", () => {
-
         loginModal.classList.remove("active");
 
         loginMessage.textContent = "";
     });
-
 
     /*
     |--------------------------------------------------------------------------
@@ -320,15 +270,12 @@ document.addEventListener("DOMContentLoaded", () => {
     */
 
     loginModal.addEventListener("click", (e) => {
-
         if (e.target === loginModal) {
-
             loginModal.classList.remove("active");
 
             loginMessage.textContent = "";
         }
     });
-
 
     /*
     |--------------------------------------------------------------------------
@@ -337,93 +284,60 @@ document.addEventListener("DOMContentLoaded", () => {
     */
 
     fakeLoginForm.addEventListener("submit", async (e) => {
-
         e.preventDefault();
 
-        const email = document
-            .getElementById("loginEmail")
-            .value
-            .trim();
+        const email = document.getElementById("loginEmail").value.trim();
 
-        const password = document
-            .getElementById("loginPassword")
-            .value
-            .trim();
-
+        const password = document.getElementById("loginPassword").value.trim();
 
         if (!email || !password) {
-
-            loginMessage.textContent =
-                "Preencha email e senha.";
+            loginMessage.textContent = "Preencha email e senha.";
 
             return;
         }
 
-
-        loginMessage.textContent =
-            "Entrando...";
-
+        loginMessage.textContent = "Entrando...";
 
         try {
+            const tokenMeta = document.querySelector('meta[name="csrf-token"]');
 
-            const tokenMeta = document.querySelector(
-                'meta[name="csrf-token"]'
-            );
-
-            const token = tokenMeta
-                ? tokenMeta.getAttribute("content")
-                : "";
-
+            const token = tokenMeta ? tokenMeta.getAttribute("content") : "";
 
             const response = await fetch("/api/login", {
-
                 method: "POST",
 
                 headers: {
                     "Content-Type": "application/json",
-                    "Accept": "application/json",
-                    "X-CSRF-TOKEN": token
+                    Accept: "application/json",
+                    "X-CSRF-TOKEN": token,
                 },
 
                 body: JSON.stringify({
                     email: email,
-                    password: password
-                })
+                    password: password,
+                }),
             });
-
 
             const data = await response.json();
 
-
             if (!response.ok) {
-
                 loginMessage.textContent =
-                    data.message ||
-                    "Email ou senha inválidos.";
+                    data.message || "Email ou senha inválidos.";
 
                 return;
             }
-
 
             loginModal.classList.remove("active");
 
             fakeLoginForm.reset();
 
             window.location.reload();
-
-
         } catch (error) {
+            console.error("Erro no login:", error);
 
-            console.error(
-                "Erro no login:",
-                error
-            );
-
-            loginMessage.textContent =
-                "Não foi possível conectar ao servidor.";
+            loginMessage.textContent = "Não foi possível conectar ao servidor.";
         }
     });
-
 
     /*
     |--------------------------------------------------------------------------
@@ -435,11 +349,8 @@ document.addEventListener("DOMContentLoaded", () => {
     */
 
     googleLogin.addEventListener("click", () => {
-
         window.location.href = "/auth/google";
-
     });
-
 
     /*
     |--------------------------------------------------------------------------
@@ -448,13 +359,10 @@ document.addEventListener("DOMContentLoaded", () => {
     */
 
     registerFake.addEventListener("click", (e) => {
-
         e.preventDefault();
 
-        loginMessage.textContent =
-            "EM DESENVOLVIMENTO";
+        loginMessage.textContent = "EM DESENVOLVIMENTO";
     });
-
 
     /*
     |--------------------------------------------------------------------------
@@ -463,7 +371,6 @@ document.addEventListener("DOMContentLoaded", () => {
     */
 
     coinsBtn.addEventListener("click", () => {
-
         if (!getUser()) {
             return;
         }
@@ -473,7 +380,6 @@ document.addEventListener("DOMContentLoaded", () => {
         sidebarOverlay.classList.add("active");
     });
 
-
     /*
     |--------------------------------------------------------------------------
     | FECHAR SIDEBAR
@@ -481,12 +387,10 @@ document.addEventListener("DOMContentLoaded", () => {
     */
 
     closeSidebar.addEventListener("click", () => {
-
         sidebar.classList.remove("active");
 
         sidebarOverlay.classList.remove("active");
     });
-
 
     /*
     |--------------------------------------------------------------------------
@@ -495,12 +399,10 @@ document.addEventListener("DOMContentLoaded", () => {
     */
 
     sidebarOverlay.addEventListener("click", () => {
-
         sidebar.classList.remove("active");
 
         sidebarOverlay.classList.remove("active");
     });
-
 
     /*
     |--------------------------------------------------------------------------
@@ -509,55 +411,37 @@ document.addEventListener("DOMContentLoaded", () => {
     */
 
     codeForm.addEventListener("submit", (e) => {
-
         e.preventDefault();
 
         const user = getUser();
 
-
         if (!user) {
+            codeMessage.textContent = "Você precisa estar logado.";
 
-            codeMessage.textContent =
-                "Você precisa estar logado.";
-
-            codeMessage.className =
-                "code-error";
+            codeMessage.className = "code-error";
 
             return;
         }
 
-
-        const codigo = codeInput.value
-            .trim()
-            .toUpperCase();
-
+        const codigo = codeInput.value.trim().toUpperCase();
 
         if (!codigo) {
+            codeMessage.textContent = "Digite um código.";
 
-            codeMessage.textContent =
-                "Digite um código.";
-
-            codeMessage.className =
-                "code-error";
+            codeMessage.className = "code-error";
 
             return;
         }
-
 
         if (!codes[codigo]) {
+            codeMessage.textContent = "Código inválido ou já utilizado.";
 
-            codeMessage.textContent =
-                "Código inválido ou já utilizado.";
-
-            codeMessage.className =
-                "code-error";
+            codeMessage.className = "code-error";
 
             return;
         }
 
-
         const moedas = codes[codigo];
-
 
         /*
         |--------------------------------------------------------------------------
@@ -571,27 +455,18 @@ document.addEventListener("DOMContentLoaded", () => {
         |
         */
 
-        user.moedas =
-            (user.moedas || 0) + moedas;
+        user.moedas = (user.moedas || 0) + moedas;
 
+        coinsValue.textContent = user.moedas;
 
-        coinsValue.textContent =
-            user.moedas;
+        codeMessage.textContent = `Código aplicado! +${moedas} moedas.`;
 
-
-        codeMessage.textContent =
-            `Código aplicado! +${moedas} moedas.`;
-
-        codeMessage.className =
-            "code-success";
-
+        codeMessage.className = "code-success";
 
         codeInput.value = "";
 
-
         delete codes[codigo];
     });
-
 
     /*
     |--------------------------------------------------------------------------
@@ -600,5 +475,4 @@ document.addEventListener("DOMContentLoaded", () => {
     */
 
     updateInterface();
-
 });
