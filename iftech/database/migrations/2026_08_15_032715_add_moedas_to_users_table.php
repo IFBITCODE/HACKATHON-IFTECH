@@ -6,18 +6,23 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up()
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            // Adiciona a coluna moedas com valor padrão 0
-            $table->integer('moedas')->default(0)->after('password'); 
+            //
         });
     }
 
-    public function down()
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('moedas');
+            //
         });
     }
 };
