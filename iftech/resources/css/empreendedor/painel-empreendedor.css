@@ -1,0 +1,283 @@
+/* =====================================================
+   PALETA
+   ===================================================== */
+:root {
+    --azul-900: #0f2742;
+    --azul-800: #163a5f;
+    --azul-700: #1e4f7a;
+    --azul-600: #25669a;
+    --azul-500: #347fb5;
+
+    --cinza-900: #1f2937;
+    --cinza-700: #4b5563;
+    --cinza-600: #6b7280;
+    --cinza-500: #9ca3af;
+    --cinza-300: #d1d5db;
+    --cinza-200: #e5e7eb;
+    --cinza-100: #f3f4f6;
+    --cinza-50: #f8fafc;
+
+    --branco: #ffffff;
+
+    --verde: #198754;
+    --vermelho: #dc3545;
+
+    --sombra: 0 4px 18px rgba(15, 39, 66, 0.08);
+    --sombra-hover: 0 8px 28px rgba(15, 39, 66, 0.13);
+}
+
+/* =====================================================
+   GERAL
+   ===================================================== */
+body {
+    background: #f4f6f8 !important;
+    color: var(--cinza-900);
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+
+/* =====================================================
+   NAVBAR
+   ===================================================== */
+.navbar {
+    background: linear-gradient(135deg, var(--azul-900), var(--azul-800)) !important;
+    min-height: 68px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 3px 15px rgba(15, 39, 66, 0.15);
+}
+
+.navbar-brand {
+    font-weight: 700;
+    letter-spacing: .2px;
+}
+
+.navbar-brand i {
+    margin-right: 8px;
+}
+
+.navbar .text-white {
+    font-size: .92rem;
+}
+
+/* =====================================================
+   CARDS
+   ===================================================== */
+.card {
+    border: 1px solid var(--cinza-200) !important;
+    border-radius: 12px !important;
+    box-shadow: var(--sombra) !important;
+    overflow: hidden;
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.card:hover {
+    box-shadow: var(--sombra-hover) !important;
+}
+
+.card-header {
+    background: #ffffff !important;
+    border-bottom: 1px solid var(--cinza-200) !important;
+}
+
+.card-header h5 {
+    color: var(--azul-900);
+    font-weight: 700;
+}
+
+/* =====================================================
+   CARDS DE INDICADORES
+   ===================================================== */
+.card-metric {
+    border-left: 4px solid var(--azul-600) !important;
+}
+
+.card-metric h6 {
+    color: var(--cinza-600) !important;
+    font-size: .82rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+}
+
+.card-metric h2 {
+    color: var(--azul-900);
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+/* =====================================================
+   BOTÕES
+   ===================================================== */
+.btn-warning {
+    background: var(--azul-700) !important;
+    border-color: var(--azul-700) !important;
+    color: #fff !important;
+}
+
+.btn-warning:hover {
+    background: var(--azul-800) !important;
+    border-color: var(--azul-800) !important;
+    color: #fff !important;
+}
+
+.btn-primary {
+    background: var(--azul-700);
+    border-color: var(--azul-700);
+}
+
+.btn-primary:hover {
+    background: var(--azul-800);
+    border-color: var(--azul-800);
+}
+
+.btn-outline-dark {
+    color: var(--azul-800) !important;
+    border-color: var(--cinza-300) !important;
+}
+
+.btn-outline-dark:hover {
+    background: var(--azul-800) !important;
+    border-color: var(--azul-800) !important;
+    color: #fff !important;
+}
+
+/* =====================================================
+   FORMULÁRIOS
+   ===================================================== */
+.form-label {
+    color: var(--cinza-900);
+    font-weight: 600;
+    font-size: .9rem;
+}
+
+.form-control {
+    border: 1px solid var(--cinza-300) !important;
+    border-radius: 8px !important;
+    padding: .65rem .8rem;
+    color: var(--cinza-900);
+    background: #fff;
+    transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+.form-control:focus {
+    border-color: var(--azul-500) !important;
+    box-shadow: 0 0 0 3px rgba(52, 127, 181, .12) !important;
+}
+
+.form-control[readonly] {
+    background: var(--cinza-50);
+    color: var(--cinza-700);
+}
+
+/* =====================================================
+   ÁREA DO CÓDIGO
+   ===================================================== */
+.codigo-box {
+    background: linear-gradient(135deg, #f8fafc, #eef4f9) !important;
+    border: 1px dashed var(--azul-500) !important;
+    border-radius: 12px !important;
+    padding: 24px !important;
+    text-align: center;
+}
+
+.codigo-principal {
+    color: var(--azul-900) !important;
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: 3px;
+    word-break: break-all;
+}
+
+#moedasGeradas {
+    color: var(--azul-600) !important;
+    font-size: .95rem;
+}
+
+/* =====================================================
+   LISTA DE CÓDIGOS
+   ===================================================== */
+.codigo-item {
+    border: 1px solid var(--cinza-200) !important;
+    border-radius: 10px !important;
+    padding: 14px 16px !important;
+    margin-bottom: 10px;
+    background: #fff;
+    transition: background .2s ease, border-color .2s ease, transform .2s ease;
+}
+
+.codigo-item:hover {
+    background: var(--cinza-50);
+    border-color: #c5d4e1 !important;
+    transform: translateY(-1px);
+}
+
+.codigo-item strong {
+    color: var(--azul-900);
+    font-size: .95rem;
+    letter-spacing: 1px;
+}
+
+/* =====================================================
+   BADGES
+   ===================================================== */
+.badge.bg-warning {
+    background: #e8eef4 !important;
+    color: var(--azul-800) !important;
+    border: 1px solid #d5e0ea;
+    font-weight: 600;
+}
+
+.badge.bg-success {
+    background: #e8f5ee !important;
+    color: #187443 !important;
+}
+
+.badge.bg-secondary {
+    background: var(--cinza-200) !important;
+    color: var(--cinza-700) !important;
+}
+
+/* =====================================================
+   ALERTA
+   ===================================================== */
+.alert-success {
+    background: #eef8f3 !important;
+    border: 1px solid #cde9d9 !important;
+    color: #176b3c !important;
+    border-radius: 10px;
+}
+
+/* =====================================================
+   BLOQUEADO
+   ===================================================== */
+.bi-lock-fill {
+    color: var(--azul-700) !important;
+}
+
+/* =====================================================
+   TEXTOS
+   ===================================================== */
+.text-muted {
+    color: var(--cinza-600) !important;
+}
+
+/* =====================================================
+   RESPONSIVO
+   ===================================================== */
+@media (max-width: 768px) {
+    .navbar-brand {
+        font-size: .95rem;
+    }
+
+    .navbar .d-flex.text-white {
+        margin-top: 10px;
+    }
+
+    .codigo-principal {
+        font-size: 1.45rem;
+        letter-spacing: 2px;
+    }
+
+    .card-body {
+        padding: 18px;
+    }
+}

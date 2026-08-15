@@ -97,12 +97,8 @@
 
         .navbar {
 
-            background:
-                linear-gradient(
-                    135deg,
-                    var(--azul-900),
-                    var(--azul-800)
-                ) !important;
+            /* Nova cor solicitada */
+            background: #28819e !important;
 
             min-height: 68px;
 
@@ -604,7 +600,7 @@
             .navbar .d-flex.text-white {
 
                 margin-top:
-                    10px;
+                    0px; /* Ajustado para manter alinhamento lateral */
 
             }
 
@@ -645,55 +641,36 @@
         class="navbar navbar-expand-lg navbar-dark mb-4 shadow-sm"
     >
 
-        <div class="container">
-
-
-            <a
-                class="navbar-brand"
-                href="#"
-            >
-
-                <i class="bi bi-shop"></i>
-
-                Portal do Empreendedor
-                <span class="d-none d-md-inline">
-                    - Turismo PB
-                </span>
-
-            </a>
-
-
+        <div class="container d-flex justify-content-between align-items-center">
+            
+            <!-- ESQUERDA: NOME DO PERFIL LOGADO -->
             <div
                 class="d-flex text-white align-items-center"
             >
-
+                <a
+                    class="navbar-brand"
+                    href="#"
+                >
+                </a>
+                
                 <i
                     class="bi bi-person-circle fs-4 me-2"
                 ></i>
 
-
-                <span class="me-3 d-none d-sm-inline">
-
+                <span class="d-none d-sm-inline">
                     {{ $empreendedor->nome_fantasia }}
-
                 </span>
 
-
-                <button
-                    type="button"
-                    id="btnLogout"
-                    class="btn btn-outline-light btn-sm"
-                >
-
-                    <i
-                        class="bi bi-box-arrow-right"
-                    ></i>
-
-                    Sair
-
-                </button>
-
             </div>
+
+            <!-- DIREITA: BOTÃO SAIR (Sem ícone) -->
+            <button
+                type="button"
+                id="btnLogout"
+                class="btn btn-outline-light btn-sm"
+            >
+                Sair
+            </button>
 
         </div>
 
