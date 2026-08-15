@@ -1,9 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-    /*
-    |--------------------------------------------------------------------------
-    | BUSCA / GUIA TURÍSTICO
-    |--------------------------------------------------------------------------
-    */
 
     const searchForm = document.getElementById("searchForm");
     const searchInput = document.getElementById("searchInput");
@@ -107,11 +102,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | ELEMENTOS DE LOGIN
-    |--------------------------------------------------------------------------
-    */
 
     const loginBtn = document.getElementById("openLogin");
     const loginModal = document.getElementById("loginModal");
@@ -120,12 +110,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const googleLogin = document.getElementById("googleLogin");
     const registerFake = document.getElementById("registerFake");
     const loginMessage = document.getElementById("loginMessage");
-
-    /*
-    |--------------------------------------------------------------------------
-    | ELEMENTOS DAS MOEDAS
-    |--------------------------------------------------------------------------
-    */
 
     const coinsBtn = document.getElementById("coinsToggle");
     const sidebar = document.getElementById("coinsSidebar");
@@ -136,11 +120,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const codeInput = document.getElementById("codeInput");
     const codeMessage = document.getElementById("codeMessage");
 
-    /*
-    |--------------------------------------------------------------------------
-    | CÓDIGOS DE MOEDAS
-    |--------------------------------------------------------------------------
-    */
 
     const codes = {
         TURISMO100: 100,
@@ -148,28 +127,11 @@ document.addEventListener("DOMContentLoaded", () => {
         GUIA25: 25,
     };
 
-    /*
-    |--------------------------------------------------------------------------
-    | USUÁRIO AUTENTICADO
-    |--------------------------------------------------------------------------
-    |
-    | A autenticação agora é controlada pelo Laravel.
-    |
-    | A Blade deve disponibilizar:
-    |
-    | window.authUser
-    |
-    */
 
     function getUser() {
         return window.authUser || null;
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | ATUALIZA INTERFACE
-    |--------------------------------------------------------------------------
-    */
 
     function updateInterface() {
         const user = getUser();
@@ -194,22 +156,14 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | BOTÃO ENTRAR / SAIR
-    |--------------------------------------------------------------------------
-    */
+
+
 
     loginBtn.addEventListener("click", async (e) => {
         e.preventDefault();
 
         const user = getUser();
 
-        /*
-        |--------------------------------------------------------------------------
-        | USUÁRIO NÃO AUTENTICADO
-        |--------------------------------------------------------------------------
-        */
 
         if (!user) {
             loginModal.classList.add("active");
@@ -217,14 +171,6 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | USUÁRIO AUTENTICADO
-        |--------------------------------------------------------------------------
-        |
-        | Faz logout através do Laravel.
-        |
-        */
 
         try {
             const tokenMeta = document.querySelector('meta[name="csrf-token"]');
@@ -251,11 +197,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    /*
-    |--------------------------------------------------------------------------
-    | FECHAR MODAL DE LOGIN
-    |--------------------------------------------------------------------------
-    */
 
     closeLogin.addEventListener("click", () => {
         loginModal.classList.remove("active");
@@ -263,11 +204,6 @@ document.addEventListener("DOMContentLoaded", () => {
         loginMessage.textContent = "";
     });
 
-    /*
-    |--------------------------------------------------------------------------
-    | FECHAR MODAL CLICANDO FORA
-    |--------------------------------------------------------------------------
-    */
 
     loginModal.addEventListener("click", (e) => {
         if (e.target === loginModal) {
@@ -277,11 +213,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    /*
-    |--------------------------------------------------------------------------
-    | LOGIN TRADICIONAL
-    |--------------------------------------------------------------------------
-    */
 
     fakeLoginForm.addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -339,24 +270,21 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    /*
-    |--------------------------------------------------------------------------
-    | LOGIN COM GOOGLE
-    |--------------------------------------------------------------------------
-    |
-    | O Laravel será responsável pelo OAuth.
-    |
-    */
+
 
     googleLogin.addEventListener("click", () => {
+
+        googleLogin.disabled = true;
+
+        googleLogin.innerHTML = `
+            <span class="google-spinner"></span>
+        `;
+
         window.location.href = "/auth/google";
     });
 
-    /*
-    |--------------------------------------------------------------------------
-    | CADASTRO
-    |--------------------------------------------------------------------------
-    */
+
+    /*CADASTRO*/
 
     registerFake.addEventListener("click", (e) => {
         e.preventDefault();
@@ -364,11 +292,6 @@ document.addEventListener("DOMContentLoaded", () => {
         loginMessage.textContent = "EM DESENVOLVIMENTO";
     });
 
-    /*
-    |--------------------------------------------------------------------------
-    | ABRIR SIDEBAR DE MOEDAS
-    |--------------------------------------------------------------------------
-    */
 
     coinsBtn.addEventListener("click", () => {
         if (!getUser()) {
@@ -380,11 +303,8 @@ document.addEventListener("DOMContentLoaded", () => {
         sidebarOverlay.classList.add("active");
     });
 
-    /*
-    |--------------------------------------------------------------------------
-    | FECHAR SIDEBAR
-    |--------------------------------------------------------------------------
-    */
+
+
 
     closeSidebar.addEventListener("click", () => {
         sidebar.classList.remove("active");
@@ -392,23 +312,12 @@ document.addEventListener("DOMContentLoaded", () => {
         sidebarOverlay.classList.remove("active");
     });
 
-    /*
-    |--------------------------------------------------------------------------
-    | FECHAR SIDEBAR PELO OVERLAY
-    |--------------------------------------------------------------------------
-    */
 
     sidebarOverlay.addEventListener("click", () => {
         sidebar.classList.remove("active");
 
         sidebarOverlay.classList.remove("active");
     });
-
-    /*
-    |--------------------------------------------------------------------------
-    | APLICAR CÓDIGO DE MOEDAS
-    |--------------------------------------------------------------------------
-    */
 
     codeForm.addEventListener("submit", (e) => {
         e.preventDefault();
@@ -443,19 +352,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const moedas = codes[codigo];
 
-        /*
-        |--------------------------------------------------------------------------
-        | ATENÇÃO
-        |--------------------------------------------------------------------------
-        |
-        | Neste momento, as moedas ainda estão sendo mantidas
-        | somente no objeto da página.
-        |
-        | Posteriormente devemos persistir isso no banco.
-        |
-        */
 
-        user.moedas = (user.moedas || 0) + moedas;
+        user.moedas =
+            (user.moedas || 0) + moedas;
 
         coinsValue.textContent = user.moedas;
 
@@ -467,12 +366,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         delete codes[codigo];
     });
-
-    /*
-    |--------------------------------------------------------------------------
-    | INICIALIZAÇÃO
-    |--------------------------------------------------------------------------
-    */
 
     updateInterface();
 });

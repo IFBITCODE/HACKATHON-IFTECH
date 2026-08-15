@@ -870,3 +870,23 @@ body {
         width: 100%;
     }
 }
+
+.google-spinner {
+    width: 18px;
+    height: 18px;
+    border: 3px solid rgba(0, 0, 0, 0.15);
+    border-top: 3px solid #4285f4;
+    border-radius: 50%;
+    display: inline-block;
+    animation: googleGirar 0.7s linear infinite;
+}
+
+@keyframes googleGirar {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
