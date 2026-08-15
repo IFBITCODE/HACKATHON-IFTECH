@@ -6,6 +6,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     
     <title>Rotaguiada | Turismo Inteligente</title>
+
+    <link rel="stylesheet" href="https://vlibras.gov.br/app/vlibras-plugin.css">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -231,5 +233,23 @@
             });
         });
     </script>
+
+    <!-- VLibras -->
+    <div vw class="enabled">
+        <div vw-access-button class="active"></div>
+
+        <div vw-plugin-wrapper>
+            <div class="vw-plugin-top-wrapper"></div>
+        </div>
+    </div>
+
+    <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+
+    <script>
+        new window.VLibras.Widget(
+            'https://vlibras.gov.br/app'
+        );
+    </script>
+    <!-- Fim VLibras -->
 </body>
 </html>
