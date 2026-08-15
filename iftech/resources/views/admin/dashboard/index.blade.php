@@ -288,6 +288,20 @@
 
     </div>
 
+    {{-- ACESSIBILIDADE --}}
+
+    <div class="card">
+
+        <h2>
+            Empreendimentos que possuem acessibilidade
+        </h2>
+
+        <div class="chart-container" style="max-width: 360px; margin: 0 auto;">
+            <canvas id="accessibilityChart"></canvas>
+        </div>
+
+    </div>
+
     {{-- PERFIL --}}
 
     {{-- CONTEÚDOS --}}
@@ -377,6 +391,26 @@ function createDoughnut(element, data) {
         options: { responsive: true, maintainAspectRatio: false }
     });
 }
+
+const accessibilityData = @json($data['accessibility']);
+
+new Chart(document.getElementById('accessibilityChart'), {
+    type: 'pie',
+    data: {
+        labels: Object.keys(accessibilityData),
+        datasets: [{
+            data: Object.values(accessibilityData),
+            backgroundColor: ['#0d6efd', '#dc2626'],
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            legend: { position: 'bottom' }
+        }
+    }
+});
 
 new Chart(
     document.getElementById('accessChart'),

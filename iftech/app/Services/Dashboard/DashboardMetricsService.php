@@ -70,6 +70,8 @@ class DashboardMetricsService
                 $previousEnd
             ),
 
+            'accessibility' => $this->buildAccessibilityStats(),
+
             'location_heatmap' => $this->buildLocationHeatmap(),
         ];
     }
@@ -150,6 +152,17 @@ class DashboardMetricsService
             ->limit(15)
             ->pluck('total', 'bairro')
             ->toArray();
+    }
+
+    private function buildAccessibilityStats(): array
+    {
+        $comAcessibilidade = Empreendedor::where('acessivel', true)->count();
+        $semAcessibilidade = Empreendedor::where('acessivel', false)->count();
+
+        return [
+            'Com recurso de acessibilidade' => $comAcessibilidade,
+            'Sem recurso de acessibilidade' => $semAcessibilidade,
+        ];
     }
 
     private function buildKpis(
