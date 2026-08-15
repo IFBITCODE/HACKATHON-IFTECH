@@ -94,7 +94,7 @@
 
         .kpis {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
+            grid-template-columns: repeat(6, 1fr);
             gap: 16px;
             margin-bottom: 24px;
         }
@@ -245,28 +245,31 @@
     ])
 
     @include('admin.dashboard.partials._kpi-card', [
-        'title' => 'Taxa de retorno',
-        'value' => $data['kpis']['return_rate']['value'] . '%',
-        'variation' => $data['kpis']['return_rate']['variation'],
-        'icon' => '↩️'
-    ])
-
-    @include('admin.dashboard.partials._kpi-card', [
         'title' => 'Empreendedores aprovados',
-        'value' => $data['empreendedores']['aprovados'],
+        'value' => $data['empreendedores']['aprovados']['value'],
+        'variation' => $data['empreendedores']['aprovados']['variation'],
         'icon' => '✅'
     ])
 
     @include('admin.dashboard.partials._kpi-card', [
         'title' => 'Empreendedores pendentes',
-        'value' => $data['empreendedores']['pendentes'],
+        'value' => $data['empreendedores']['pendentes']['value'],
+        'variation' => $data['empreendedores']['pendentes']['variation'],
         'icon' => '⏳'
     ])
 
     @include('admin.dashboard.partials._kpi-card', [
         'title' => 'Empreendedores rejeitados',
-        'value' => $data['empreendedores']['rejeitados'],
+        'value' => $data['empreendedores']['rejeitados']['value'],
+        'variation' => $data['empreendedores']['rejeitados']['variation'],
         'icon' => '❌'
+    ])
+
+    @include('admin.dashboard.partials._kpi-card', [
+        'title' => 'Turistas registrados',
+        'value' => number_format($data['usuarios']['turistas']['value'], 0, ',', '.'),
+        'variation' => $data['usuarios']['turistas']['variation'],
+        'icon' => '🧭'
     ])
 
 </section>
@@ -286,19 +289,6 @@
     </div>
 
     {{-- PERFIL --}}
-
-    <div class="charts-grid">
-
-        <div class="card">
-            <h2>Mapa de calor — Empreendedores aprovados por bairro</h2>
-            <div id="heatmapList">
-                <p class="text-muted" id="heatmapEmpty" style="display:none; color:#6b7280;">
-                    Nenhum empreendedor aprovado com bairro cadastrado ainda.
-                </p>
-            </div>
-        </div>
-
-    </div>
 
     {{-- CONTEÚDOS --}}
 

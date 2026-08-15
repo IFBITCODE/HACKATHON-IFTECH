@@ -15,8 +15,6 @@ class PrefeituraDashboardController extends Controller
 
     public function index()
     {
-        // Reaproveita o mesmo service que alimenta /admin/dashboard,
-        // pedindo o período "mês" como resumo padrão da home.
         $data = $this->dashboardService->getDashboardData('month');
 
         $pendentesCount = Empreendedor::where('status', 'pendente')->count();

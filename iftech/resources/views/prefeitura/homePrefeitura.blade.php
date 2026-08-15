@@ -80,8 +80,8 @@
                         <span class="value">{{ number_format($data['kpis']['unique_visitors']['value'], 0, ',', '.') }}</span>
                     </div>
                     <div class="d-flex justify-content-between">
-                        <span class="label">Taxa de retorno</span>
-                        <span class="value">{{ $data['kpis']['return_rate']['value'] }}%</span>
+                        <span class="label">Turistas registrados</span>
+                        <span class="value">{{ number_format($data['usuarios']['turistas']['value'], 0, ',', '.') }}</span>
                     </div>
                 </div>
             </div>
@@ -120,7 +120,7 @@
 
         <hr class="mb-4">
 
-        <!-- SEÇÃO 2: Tabela de Solicitações (escopo original do teu colega) -->
+        <!-- SEÇÃO 2: Tabela de Solicitações -->
         <div class="row">
             <div class="col-12">
                 <div class="card shadow-sm">

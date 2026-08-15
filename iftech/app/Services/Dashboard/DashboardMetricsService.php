@@ -4,6 +4,7 @@ namespace App\Services\Dashboard;
 
 use App\Models\Empreendedor;
 use App\Models\MetricDaily;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
@@ -55,19 +56,86 @@ class DashboardMetricsService
                 'geo' => $this->aggregateJson($current, 'geo_origin', false),
             ],
 
-            'empreendedores' => $this->buildEmpreendedoresStats(),
+            'empreendedores' => $this->buildEmpreendedoresStats(
+                $start,
+                $end,
+                $previousStart,
+                $previousEnd
+            ),
+
+            'usuarios' => $this->buildUsuariosStats(
+                $start,
+                $end,
+                $previousStart,
+                $previousEnd
+            ),
+
             'location_heatmap' => $this->buildLocationHeatmap(),
         ];
     }
 
-    private function buildEmpreendedoresStats(): array
-    {
+    private function buildEmpreendedoresStats(
+        Carbon $start,
+        Carbon $end,
+        Carbon $previousStart,
+        Carbon $previousEnd
+    ): array {
+        $countByStatus = fn (string $status, Carbon $from, Carbon $to) =>
+            Empreendedor::where('status', $status)
+                ->whereBetween('created_at', [$from, $to])
+                ->count();
+
+        $aprovados = $countByStatus('aprovado', $start, $end);
+        $pendentes = $countByStatus('pendente', $start, $end);
+        $rejeitados = $countByStatus('rejeitado', $start, $end);
+
+        $aprovadosAnterior = $countByStatus('aprovado', $previousStart, $previousEnd);
+        $pendentesAnterior = $countByStatus('pendente', $previousStart, $previousEnd);
+        $rejeitadosAnterior = $countByStatus('rejeitado', $previousStart, $previousEnd);
+
         return [
-            'pendentes' => Empreendedor::where('status', 'pendente')->count(),
-            'aprovados' => Empreendedor::where('status', 'aprovado')->count(),
-            'rejeitados' => Empreendedor::where('status', 'rejeitado')->count(),
-            'suspensos' => Empreendedor::where('status', 'suspenso')->count(),
-            'total' => Empreendedor::count(),
+            'aprovados' => [
+                'value' => $aprovados,
+                'variation' => $this->variation($aprovados, $aprovadosAnterior),
+            ],
+
+            'pendentes' => [
+                'value' => $pendentes,
+                'variation' => $this->variation($pendentes, $pendentesAnterior),
+            ],
+
+            'rejeitados' => [
+                'value' => $rejeitados,
+                'variation' => $this->variation($rejeitados, $rejeitadosAnterior),
+            ],
+
+            'suspensos' => Empreendedor::where('status', 'suspenso')
+                ->whereBetween('created_at', [$start, $end])
+                ->count(),
+
+            'total' => Empreendedor::whereBetween('created_at', [$start, $end])->count(),
+        ];
+    }
+
+    private function buildUsuariosStats(
+        Carbon $start,
+        Carbon $end,
+        Carbon $previousStart,
+        Carbon $previousEnd
+    ): array {
+        $turistas = User::where('role', 'turista')
+            ->whereBetween('created_at', [$start, $end])
+            ->count();
+
+        $turistasAnterior = User::where('role', 'turista')
+            ->whereBetween('created_at', [$previousStart, $previousEnd])
+            ->count();
+
+        return [
+            'turistas' => [
+                'value' => $turistas,
+                'variation' => $this->variation($turistas, $turistasAnterior),
+            ],
         ];
     }
 
