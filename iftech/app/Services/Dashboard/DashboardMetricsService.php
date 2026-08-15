@@ -2,6 +2,7 @@
 
 namespace App\Services\Dashboard;
 
+use App\Models\Empreendedor;
 use App\Models\MetricDaily;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
@@ -38,69 +39,49 @@ class DashboardMetricsService
         )->get();
 
         return [
-            'period' => [
-                'type' => $period,
-                'start' => $start,
-                'end' => $end,
-                'previous_start' => $previousStart,
-                'previous_end' => $previousEnd,
-            ],
+            'period' => [ /* ...igual... */ ],
 
-            'kpis' => $this->buildKpis(
-                $current,
-                $previous
-            ),
+            'kpis' => $this->buildKpis($current, $previous),
 
             'timeline' => $this->buildTimeline($current),
 
             'top_content' => [
-                'pages' => $this->aggregateJson(
-                    $current,
-                    'top_pages'
-                ),
-
-                'attractions' => $this->aggregateJson(
-                    $current,
-                    'top_attractions'
-                ),
-
-                'routes' => $this->aggregateJson(
-                    $current,
-                    'top_routes'
-                ),
-
-                'events' => $this->aggregateJson(
-                    $current,
-                    'top_events'
-                ),
+                'attractions' => $this->aggregateJson($current, 'top_attractions'),
+                'routes' => $this->aggregateJson($current, 'top_routes'),
+                'events' => $this->aggregateJson($current, 'top_events'),
             ],
 
             'profile' => [
-                'geo' => $this->aggregateJson(
-                    $current,
-                    'geo_origin',
-                    false
-                ),
-
-                'languages' => $this->aggregateJson(
-                    $current,
-                    'languages',
-                    false
-                ),
-
-                'devices' => $this->aggregateJson(
-                    $current,
-                    'devices',
-                    false
-                ),
-
-                'channels' => $this->aggregateJson(
-                    $current,
-                    'channels',
-                    false
-                ),
+                'geo' => $this->aggregateJson($current, 'geo_origin', false),
             ],
+
+            'empreendedores' => $this->buildEmpreendedoresStats(),
+            'location_heatmap' => $this->buildLocationHeatmap(),
         ];
+    }
+
+    private function buildEmpreendedoresStats(): array
+    {
+        return [
+            'pendentes' => Empreendedor::where('status', 'pendente')->count(),
+            'aprovados' => Empreendedor::where('status', 'aprovado')->count(),
+            'rejeitados' => Empreendedor::where('status', 'rejeitado')->count(),
+            'suspensos' => Empreendedor::where('status', 'suspenso')->count(),
+            'total' => Empreendedor::count(),
+        ];
+    }
+
+    private function buildLocationHeatmap(): array
+    {
+        return Empreendedor::where('status', 'aprovado')
+            ->whereNotNull('bairro')
+            ->where('bairro', '!=', '')
+            ->selectRaw('bairro, COUNT(*) as total')
+            ->groupBy('bairro')
+            ->orderByDesc('total')
+            ->limit(15)
+            ->pluck('total', 'bairro')
+            ->toArray();
     }
 
     private function buildKpis(

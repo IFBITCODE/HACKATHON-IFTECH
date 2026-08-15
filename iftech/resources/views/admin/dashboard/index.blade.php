@@ -237,82 +237,39 @@
 
     <section class="kpis">
 
-        @include(
-            'admin.dashboard.partials._kpi-card',
-            [
-                'title' => 'Acessos totais',
-                'value' => number_format(
-                    $data['kpis']['accesses']['value'],
-                    0,
-                    ',',
-                    '.'
-                ),
-                'variation' =>
-                    $data['kpis']['accesses']['variation'],
-                'icon' => '👁️'
-            ]
-        )
+    @include('admin.dashboard.partials._kpi-card', [
+        'title' => 'Acessos totais',
+        'value' => number_format($data['kpis']['accesses']['value'], 0, ',', '.'),
+        'variation' => $data['kpis']['accesses']['variation'],
+        'icon' => '👁️'
+    ])
 
-        @include(
-            'admin.dashboard.partials._kpi-card',
-            [
-                'title' => 'Visitantes únicos',
-                'value' => number_format(
-                    $data['kpis']['unique_visitors']['value'],
-                    0,
-                    ',',
-                    '.'
-                ),
-                'variation' =>
-                    $data['kpis']['unique_visitors']['variation'],
-                'icon' => '👥'
-            ]
-        )
+    @include('admin.dashboard.partials._kpi-card', [
+        'title' => 'Taxa de retorno',
+        'value' => $data['kpis']['return_rate']['value'] . '%',
+        'variation' => $data['kpis']['return_rate']['variation'],
+        'icon' => '↩️'
+    ])
 
-        @include(
-            'admin.dashboard.partials._kpi-card',
-            [
-                'title' => 'Visitantes recorrentes',
-                'value' => number_format(
-                    $data['kpis']['recurring_visitors']['value'],
-                    0,
-                    ',',
-                    '.'
-                ),
-                'variation' =>
-                    $data['kpis']['recurring_visitors']['variation'],
-                'icon' => '🔄'
-            ]
-        )
+    @include('admin.dashboard.partials._kpi-card', [
+        'title' => 'Empreendedores aprovados',
+        'value' => $data['empreendedores']['aprovados'],
+        'icon' => '✅'
+    ])
 
-        @include(
-            'admin.dashboard.partials._kpi-card',
-            [
-                'title' => 'Tempo médio',
-                'value' =>
-                    gmdate(
-                        'i\m\ s\s',
-                        $data['kpis']['avg_navigation']['value']
-                    ),
-                'variation' =>
-                    $data['kpis']['avg_navigation']['variation'],
-                'icon' => '⏱️'
-            ]
-        )
+    @include('admin.dashboard.partials._kpi-card', [
+        'title' => 'Empreendedores pendentes',
+        'value' => $data['empreendedores']['pendentes'],
+        'icon' => '⏳'
+    ])
 
-        @include(
-            'admin.dashboard.partials._kpi-card',
-            [
-                'title' => 'Taxa de retorno',
-                'value' =>
-                    $data['kpis']['return_rate']['value'] . '%',
-                'variation' =>
-                    $data['kpis']['return_rate']['variation'],
-                'icon' => '↩️'
-            ]
-        )
+    @include('admin.dashboard.partials._kpi-card', [
+        'title' => 'Empreendedores rejeitados',
+        'value' => $data['empreendedores']['rejeitados'],
+        'icon' => '❌'
+    ])
 
-    </section>
+</section>
 
     {{-- EVOLUÇÃO --}}
 
@@ -333,51 +290,12 @@
     <div class="charts-grid">
 
         <div class="card">
-
-            <h2>
-                Origem geográfica
-            </h2>
-
-            <div class="chart-container">
-                <canvas id="geoChart"></canvas>
+            <h2>Mapa de calor — Empreendedores aprovados por bairro</h2>
+            <div id="heatmapList">
+                <p class="text-muted" id="heatmapEmpty" style="display:none; color:#6b7280;">
+                    Nenhum empreendedor aprovado com bairro cadastrado ainda.
+                </p>
             </div>
-
-        </div>
-
-        <div class="card">
-
-            <h2>
-                Dispositivos
-            </h2>
-
-            <div class="chart-container">
-                <canvas id="deviceChart"></canvas>
-            </div>
-
-        </div>
-
-        <div class="card">
-
-            <h2>
-                Idiomas
-            </h2>
-
-            <div class="chart-container">
-                <canvas id="languageChart"></canvas>
-            </div>
-
-        </div>
-
-        <div class="card">
-
-            <h2>
-                Canais de origem
-            </h2>
-
-            <div class="chart-container">
-                <canvas id="channelChart"></canvas>
-            </div>
-
         </div>
 
     </div>
@@ -385,34 +303,6 @@
     {{-- CONTEÚDOS --}}
 
     <div class="content-grid">
-
-        <div class="card">
-
-            <h2>
-                Atrativos mais acessados
-            </h2>
-
-            @foreach(
-                $data['top_content']['attractions']
-                as $name => $value
-            )
-
-                <div class="ranking-item">
-                    <span>{{ $name }}</span>
-
-                    <strong>
-                        {{ number_format(
-                            $value,
-                            0,
-                            ',',
-                            '.'
-                        ) }}
-                    </strong>
-                </div>
-
-            @endforeach
-
-        </div>
 
         <div class="card">
 
@@ -470,34 +360,6 @@
 
         </div>
 
-        <div class="card">
-
-            <h2>
-                Páginas mais acessadas
-            </h2>
-
-            @foreach(
-                $data['top_content']['pages']
-                as $name => $value
-            )
-
-                <div class="ranking-item">
-                    <span>{{ $name }}</span>
-
-                    <strong>
-                        {{ number_format(
-                            $value,
-                            0,
-                            ',',
-                            '.'
-                        ) }}
-                    </strong>
-                </div>
-
-            @endforeach
-
-        </div>
-
     </div>
 
 </div>
@@ -506,81 +368,74 @@
 
 const timeline = @json($data['timeline']);
 
+new Chart(document.getElementById('accessChart'), {
+    type: 'line',
+    data: {
+        labels: timeline.labels,
+        datasets: [
+            { label: 'Acessos', data: timeline.accesses, tension: 0.3 },
+            { label: 'Visitantes únicos', data: timeline.unique_visitors, tension: 0.3 }
+        ]
+    },
+    options: { responsive: true, maintainAspectRatio: false }
+});
+
+function createDoughnut(element, data) {
+    new Chart(document.getElementById(element), {
+        type: 'doughnut',
+        data: { labels: Object.keys(data), datasets: [{ data: Object.values(data) }] },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+}
+
 new Chart(
     document.getElementById('accessChart'),
     {
         type: 'line',
-
         data: {
             labels: timeline.labels,
-
             datasets: [
-                {
-                    label: 'Acessos',
-                    data: timeline.accesses,
-                    tension: 0.3
-                },
-                {
-                    label: 'Visitantes únicos',
-                    data: timeline.unique_visitors,
-                    tension: 0.3
-                }
+                { label: 'Acessos', data: timeline.accesses, tension: 0.3 },
+                { label: 'Visitantes únicos', data: timeline.unique_visitors, tension: 0.3 }
             ]
         },
-
-        options: {
-            responsive: true,
-            maintainAspectRatio: false
-        }
+        options: { responsive: true, maintainAspectRatio: false }
     }
 );
 
-function createDoughnut(
-    element,
-    data
-) {
-    new Chart(
-        document.getElementById(element),
-        {
-            type: 'doughnut',
+// --- Mapa de calor por bairro ---
+const heatmapData = @json($data['location_heatmap']);
+const heatmapContainer = document.getElementById('heatmapList');
+const emptyMessage = document.getElementById('heatmapEmpty');
 
-            data: {
-                labels: Object.keys(data),
+const entries = Object.entries(heatmapData);
 
-                datasets: [
-                    {
-                        data: Object.values(data)
-                    }
-                ]
-            },
+if (entries.length === 0) {
+    emptyMessage.style.display = 'block';
+} else {
+    const maxValue = Math.max(...entries.map(([, total]) => total));
 
-            options: {
-                responsive: true,
-                maintainAspectRatio: false
-            }
-        }
-    );
+    entries.forEach(([bairro, total]) => {
+        const intensity = total / maxValue;
+        const color = `rgba(220, 38, 38, ${0.15 + intensity * 0.75})`;
+
+        const row = document.createElement('div');
+        row.style.display = 'flex';
+        row.style.alignItems = 'center';
+        row.style.gap = '12px';
+        row.style.padding = '8px 0';
+
+        row.innerHTML = `
+            <div style="flex:1; font-size:14px; color:#374151;">${bairro}</div>
+            <div style="flex:3; background:#f3f4f6; border-radius:6px; overflow:hidden; height:20px;">
+                <div style="width:${intensity * 100}%; height:100%; background:${color};"></div>
+            </div>
+            <strong style="width:32px; text-align:right; font-size:14px;">${total}</strong>
+        `;
+
+        heatmapContainer.appendChild(row);
+    });
 }
-
-createDoughnut(
-    'geoChart',
-    @json($data['profile']['geo'])
-);
-
-createDoughnut(
-    'deviceChart',
-    @json($data['profile']['devices'])
-);
-
-createDoughnut(
-    'languageChart',
-    @json($data['profile']['languages'])
-);
-
-createDoughnut(
-    'channelChart',
-    @json($data['profile']['channels'])
-);
 
 </script>
 
