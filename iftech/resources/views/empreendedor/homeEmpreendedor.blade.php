@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Portal do Empreendedor | Turismo Inteligente</title>
+    <title>Portal do Empreendedor </title>
 
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -25,29 +25,9 @@
 
 <body>
 
-<div class="main-wrapper">
-    <!-- Header / Navbar Principal -->
-    <header class="portal-header">
-        <div class="header-container">
-            <div class="brand">
-                <div class="brand-icon">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-                    </svg>
-                </div>
-                <div class="brand-text">
-                    <span class="portal-name">Turismo Inteligente</span>
-                    <span class="portal-sub">Portal do Município</span>
-                </div>
-            </div>
+    <body style="background-image: url('{{ asset('imagens/fundo.png') }}');">
 
-            <nav class="header-nav">
-                <button type="button" class="nav-btn active" id="btnNavWelcome" onclick="switchView('welcome')">Início</button>
-                <button type="button" class="nav-btn" id="btnNavLogin" onclick="switchView('login')">Entrar</button>
-                <button type="button" class="nav-btn primary" id="btnNavRegister" onclick="switchView('register')">Cadastrar Negócio</button>
-            </nav>
-        </div>
-    </header>
+<div class="main-wrapper">
 
     <!-- Conteúdo Centralizado -->
     <main class="content-container">

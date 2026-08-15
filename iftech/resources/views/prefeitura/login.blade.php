@@ -21,7 +21,7 @@
         <h1>ROTAGUIADA</h1>
 
         <p class="subtitle">
-            Acesso administrativo
+            Portal administrativo
         </p>
 
         <form

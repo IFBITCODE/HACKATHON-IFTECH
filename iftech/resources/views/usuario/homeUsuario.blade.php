@@ -27,10 +27,6 @@
         <div class="login-box">
             <button class="close-login" id="closeLogin">&times;</button>
             
-            <div class="login-icon">
-                <i class="fa-solid fa-compass"></i>
-            </div>
-            
             <h2>Entrar</h2>
             
             <p class="login-subtitle">

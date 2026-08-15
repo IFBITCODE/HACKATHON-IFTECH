@@ -303,9 +303,6 @@ document.addEventListener("DOMContentLoaded", () => {
         sidebarOverlay.classList.add("active");
     });
 
-
-
-
     closeSidebar.addEventListener("click", () => {
         sidebar.classList.remove("active");
 
