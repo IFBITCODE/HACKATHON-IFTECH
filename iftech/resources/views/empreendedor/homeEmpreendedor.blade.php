@@ -217,6 +217,11 @@
                             </div>
 
                             <div class="input-group-custom">
+                                <label for="city">Cidade</label>
+                                <input type="text" id="city" placeholder="Nome da cidade">
+                            </div>
+
+                            <div class="input-group-custom">
                                 <label for="neighborhood">Bairro ou Distrito</label>
                                 <input type="text" id="neighborhood" placeholder="Ex: Centro, Zona Rural">
                             </div>
