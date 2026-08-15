@@ -9,6 +9,7 @@ use App\Http\Controllers\PrefeituraDashboardController;
 use App\Http\Controllers\AuthController;
 
 // Página principal do usuário/turista
+// Página principal do usuário/turista
 Route::get('/', function () {
     return view('usuario.HomeUsuario');
 })->name('home');
@@ -34,7 +35,7 @@ Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallbac
 // Página de login da prefeitura
 Route::get('/login-prefeitura', function () {
     return view('prefeitura.login');
-}) ->name('login-prefeitura');
+}) ->name('login');
 
 Route::post('/login-prefeitura', [AuthController::class, 'loginPrefeitura'])
     ->name('login-prefeitura.submit');
@@ -61,7 +62,7 @@ Route::get(
 
 Route::get('/login-empreendedor', function () {
     return view('empreendedor.homeEmpreendedor');
-})->name('login-empreendedor');
+})->name('login');
 
 
 // Logout da sessão web
@@ -78,17 +79,21 @@ Route::get('/logado-empreendedor', [EmpreendedorController::class, 'painel'])
     ->middleware('auth')
     ->name('empreendedor.painel');
 
-// Códigos de troca do empreendedor
+
+// Códigos de troca do empreendedor (Fila Rotativa)
 Route::middleware('auth')->group(function () {
-    Route::get('/empreendedor/codigos', [EmpreendedorController::class, 'listarCodigos']);
-    Route::post('/empreendedor/codigos/gerar', [EmpreendedorController::class, 'gerarCodigo']);
+    
+    // ROTA NOVA: Atualiza o valor do código atual e dos próximos
+    Route::post('/empreendedor/fila/atualizar', [EmpreendedorController::class, 'atualizarValorFila']);
+    
+    // Rota mantida para o turista poder resgatar e apagar o código
     Route::post('/usuario/codigos/usar', [EmpreendedorController::class, 'usarCodigo']);
+    
 });
 
 // Abrir o chat
 Route::get('/chat', [ChatbotController::class, 'index']);
 
-// Envia a mensagem do usuário e retorna a resposta da IA
 Route::post('/chat', [ChatbotController::class, 'responder']);
 
 // Diagnóstico do chatbot

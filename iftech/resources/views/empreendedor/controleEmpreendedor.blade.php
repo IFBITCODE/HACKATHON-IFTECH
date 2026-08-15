@@ -973,316 +973,50 @@
                      CÓDIGOS
                      ============================================= -->
 
-                <div class="col-lg-5 mb-4">
+                <!-- COLUNA DIREITA: CÓDIGO ROTATIVO -->
+            <div class="col-lg-5 mb-4">
+                <div class="card shadow-sm h-100 border-warning">
+                    <div class="card-header bg-warning text-dark py-3">
+                        <h5 class="mb-0">
+                            <i class="bi bi-upc-scan"></i> Código Automático (Turista)
+                        </h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <p class="text-muted small mb-4">
+                            Este é o seu código atual. Assim que um turista utilizá-lo, <strong>um novo código será gerado automaticamente</strong> no lugar dele.
+                        </p>
 
-                    <div
-                        class="card shadow-sm h-100"
-                    >
+                        @php
+                            $codigoAtual = $codigos->first(); 
+                        @endphp
 
-
-                        <div
-                            class="card-header py-3"
-                        >
-
-                            <h5 class="mb-0">
-
-                                <i
-                                    class="bi bi-upc-scan me-2"
-                                    style="color: var(--azul-600);"
-                                ></i>
-
-                                Código de Troca
-
-                            </h5>
-
+                        <!-- CAIXA DO CÓDIGO DA FILA -->
+                        <div class="codigo-box p-4 mb-4">
+                            <div class="text-muted fw-bold mb-2">AGUARDANDO RESGATE</div>
+                            <div id="codigoGerado" class="codigo-principal mb-2">
+                                {{ $codigoAtual ? $codigoAtual->codigo : 'NENHUM-CÓDIGO' }}
+                            </div>
+                            <div class="badge bg-warning text-dark fs-6" id="badgeMoedas">
+                                <i class="bi bi-coin"></i> {{ $codigoAtual ? $codigoAtual->moedas : 0 }} moedas
+                            </div>
                         </div>
 
+                        <hr>
 
-
-                        <div class="card-body">
-
-
-                            <p class="text-muted">
-
-                                Escolha quantas moedas o usuário
-                                receberá e gere um código para
-                                entregar a ele.
-
-                            </p>
-
-
-
-                            <!-- QUANTIDADE -->
-
-                            <div class="mb-3">
-
-                                <label
-                                    for="quantidadeMoedas"
-                                    class="form-label fw-bold"
-                                >
-
-                                    <i
-                                        class="bi bi-coin me-1"
-                                        style="color: var(--azul-600);"
-                                    ></i>
-
-                                    Quantidade de moedas
-
-                                </label>
-
-
-                                <input
-                                    type="number"
-                                    id="quantidadeMoedas"
-                                    class="form-control"
-                                    min="1"
-                                    max="10000"
-                                    value="1"
-                                    required
-                                >
-
-
-                                <small class="text-muted">
-
-                                    Escolha de 1 a 10.000 moedas.
-
-                                </small>
-
+                        <!-- FORMULÁRIO PARA ALTERAR O VALOR DA FILA -->
+                        <form id="formFila" class="text-start">
+                            <label class="form-label fw-bold">Alterar valor da recompensa</label>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text bg-light"><i class="bi bi-coin"></i></span>
+                                <input type="number" id="quantidadeMoedas" class="form-control" value="{{ $codigoAtual ? $codigoAtual->moedas : 50 }}" min="1">
+                                <button type="button" id="btnAtualizarFila" class="btn btn-warning fw-bold">Atualizar</button>
                             </div>
-
-
-
-                            <!-- BOTÃO GERAR -->
-
-                            <button
-                                type="button"
-                                id="btnGerarCodigo"
-                                class="btn btn-warning w-100 fw-bold mb-3"
-                            >
-
-                                <i
-                                    class="bi bi-plus-circle me-1"
-                                ></i>
-
-                                Gerar novo código
-
-                            </button>
-
-
-
-                            <!-- CÓDIGO GERADO -->
-
-                            <div
-                                id="codigoGeradoBox"
-                                class="codigo-box mb-4"
-                                style="display:none;"
-                            >
-
-                                <small
-                                    class="text-muted d-block mb-2"
-                                >
-
-                                    NOVO CÓDIGO
-
-                                </small>
-
-
-                                <div
-                                    id="codigoGerado"
-                                    class="codigo-principal"
-                                >
-
-                                    ---
-
-                                </div>
-
-
-                                <div
-                                    id="moedasGeradas"
-                                    class="mt-2 fw-bold"
-                                >
-
-                                    0 moedas
-
-                                </div>
-
-
-                                <button
-                                    type="button"
-                                    id="btnCopiarCodigo"
-                                    class="btn btn-outline-dark btn-sm mt-3"
-                                >
-
-                                    <i
-                                        class="bi bi-copy me-1"
-                                    ></i>
-
-                                    Copiar código
-
-                                </button>
-
-                            </div>
-
-
-
-                            <!-- LISTA -->
-
-                            <div
-                                class="d-flex justify-content-between align-items-center mb-3"
-                            >
-
-                                <h6
-                                    class="mb-0"
-                                    style="color: var(--azul-900);"
-                                >
-
-                                    Códigos gerados
-
-                                </h6>
-
-
-                                <span
-                                    class="badge bg-light text-dark border"
-                                >
-
-                                    {{ $codigos->count() }}
-
-                                </span>
-
-                            </div>
-
-
-                            <div id="listaCodigos">
-
-
-                                @forelse($codigos as $codigo)
-
-
-                                    <div
-                                        class="codigo-item d-flex justify-content-between align-items-center"
-                                    >
-
-
-                                        <div>
-
-                                            <strong>
-                                                {{ $codigo->codigo }}
-                                            </strong>
-
-
-                                            <br>
-
-
-                                            <span
-                                                class="badge bg-warning text-dark mt-1"
-                                            >
-
-                                                <i
-                                                    class="bi bi-coin"
-                                                ></i>
-
-
-                                                {{ $codigo->moedas ?? 1 }}
-
-
-                                                {{ ($codigo->moedas ?? 1) == 1 ? 'moeda' : 'moedas' }}
-
-                                            </span>
-
-
-                                            <br>
-
-
-                                            <small
-                                                class="text-muted"
-                                            >
-
-                                                {{ $codigo->created_at->format('d/m/Y H:i') }}
-
-                                            </small>
-
-                                        </div>
-
-
-
-                                        @if($codigo->status === 'utilizado')
-
-
-                                            <span
-                                                class="badge bg-secondary"
-                                            >
-
-                                                <i
-                                                    class="bi bi-check2"
-                                                ></i>
-
-                                                Utilizado
-
-                                            </span>
-
-
-                                        @else
-
-
-                                            <span
-                                                class="badge bg-success"
-                                            >
-
-                                                <i
-                                                    class="bi bi-circle-fill"
-                                                    style="font-size: .45rem;"
-                                                ></i>
-
-                                                Disponível
-
-                                            </span>
-
-
-                                        @endif
-
-
-                                    </div>
-
-
-                                @empty
-
-
-                                    <div
-                                        id="semCodigos"
-                                        class="text-center py-4"
-                                    >
-
-                                        <i
-                                            class="bi bi-upc-scan"
-                                            style="
-                                                font-size: 2rem;
-                                                color: var(--cinza-300);
-                                            "
-                                        ></i>
-
-
-                                        <p
-                                            class="text-muted mb-0 mt-2"
-                                        >
-
-                                            Nenhum código gerado ainda.
-
-                                        </p>
-
-                                    </div>
-
-
-                                @endforelse
-
-
-                            </div>
-
-
-                        </div>
+                            <small class="text-muted">Isso mudará o valor do código atual e de todos os próximos que forem gerados automaticamente.</small>
+                        </form>
 
                     </div>
-
                 </div>
+            </div>
 
 
             </div>
@@ -1380,538 +1114,125 @@
 
 
     <script>
+    /* =====================================================
+       CSRF
+       ===================================================== */
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-        /* =====================================================
-           CSRF
-           ===================================================== */
+    /* =====================================================
+       LOGOUT
+       ===================================================== */
+    const btnLogout = document.getElementById('btnLogout');
 
-        const csrfToken =
-            document
-                .querySelector(
-                    'meta[name="csrf-token"]'
-                )
-                .getAttribute('content');
-
-
-
-        /* =====================================================
-           LOGOUT
-           ===================================================== */
-
-        const btnLogout =
-            document.getElementById(
-                'btnLogout'
-            );
-
-
-        btnLogout?.addEventListener(
-            'click',
-            async () => {
-
-                const textoOriginal =
-                    btnLogout.innerHTML;
-
-
-                try {
-
-                    btnLogout.disabled = true;
-
-
-                    btnLogout.innerHTML =
-                        '<span class="spinner-border spinner-border-sm me-1"></span>Saindo...';
-
-
-                    const response =
-                        await fetch(
-                            '/logout',
-                            {
-                                method: 'POST',
-
-                                headers: {
-                                    'Accept':
-                                        'application/json',
-
-                                    'X-CSRF-TOKEN':
-                                        csrfToken
-                                }
-                            }
-                        );
-
-
-                    if (!response.ok) {
-
-                        throw new Error(
-                            'Não foi possível sair da conta.'
-                        );
-
-                    }
-
-
-                } catch (error) {
-
-                    console.error(
-                        'Erro ao sair:',
-                        error
-                    );
-
-                } finally {
-
-                    localStorage.removeItem(
-                        'auth_token'
-                    );
-
-
-                    window.location.href =
-                        '/login-empreendedor';
-
+    btnLogout?.addEventListener('click', async () => {
+        const textoOriginal = btnLogout.innerHTML;
+        try {
+            btnLogout.disabled = true;
+            btnLogout.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Saindo...';
+            
+            const response = await fetch('/logout', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
                 }
+            });
 
+            if (!response.ok) {
+                throw new Error('Não foi possível sair da conta.');
             }
-        );
-
-
-
-        /* =====================================================
-           ELEMENTOS
-           ===================================================== */
-
-        const btnGerarCodigo =
-            document.getElementById(
-                'btnGerarCodigo'
-            );
-
-
-        const quantidadeMoedas =
-            document.getElementById(
-                'quantidadeMoedas'
-            );
-
-
-        const codigoGeradoBox =
-            document.getElementById(
-                'codigoGeradoBox'
-            );
-
-
-        const moedasGeradas =
-            document.getElementById(
-                'moedasGeradas'
-            );
-
-
-        const codigoGerado =
-            document.getElementById(
-                'codigoGerado'
-            );
-
-
-        const btnCopiarCodigo =
-            document.getElementById(
-                'btnCopiarCodigo'
-            );
-
-
-        const listaCodigos =
-            document.getElementById(
-                'listaCodigos'
-            );
-
-
-        const totalCodigos =
-            document.getElementById(
-                'totalCodigos'
-            );
-
-
-
-        /* =====================================================
-           GERAR CÓDIGO
-           ===================================================== */
-
-        btnGerarCodigo?.addEventListener(
-            'click',
-            async () => {
-
-                const textoOriginal =
-                    btnGerarCodigo.innerHTML;
-
-
-                try {
-
-                    const moedas =
-                        Number(
-                            quantidadeMoedas.value
-                        );
-
-
-                    if (
-                        !Number.isInteger(moedas) ||
-                        moedas < 1 ||
-                        moedas > 10000
-                    ) {
-
-                        alert(
-                            'Informe uma quantidade de moedas entre 1 e 10.000.'
-                        );
-
-
-                        quantidadeMoedas.focus();
-
-
-                        return;
-
-                    }
-
-
-                    btnGerarCodigo.disabled =
-                        true;
-
-
-                    btnGerarCodigo.innerHTML =
-                        '<span class="spinner-border spinner-border-sm me-2"></span>Gerando...';
-
-
-                    const response =
-                        await fetch(
-                            '/empreendedor/codigos/gerar',
-                            {
-
-                                method: 'POST',
-
-                                headers: {
-
-                                    'Accept':
-                                        'application/json',
-
-                                    'Content-Type':
-                                        'application/json',
-
-                                    'X-CSRF-TOKEN':
-                                        csrfToken
-
-                                },
-
-                                body:
-                                    JSON.stringify({
-                                        moedas: moedas
-                                    })
-
-                            }
-                        );
-
-
-                    const data =
-                        await response.json();
-
-
-                    if (!response.ok) {
-
-                        throw new Error(
-                            data.message ||
-                            'Não foi possível gerar o código.'
-                        );
-
-                    }
-
-
-                    codigoGerado.textContent =
-                        data.codigo;
-
-
-                    moedasGeradas.textContent =
-                        `${data.moedas} ${
-                            data.moedas === 1
-                                ? 'moeda'
-                                : 'moedas'
-                        }`;
-
-
-                    codigoGeradoBox.style.display =
-                        'block';
-
-
-                    alert(
-                        'Código gerado com sucesso!\n\n' +
-                        'Código: ' +
-                        data.codigo +
-                        '\n' +
-                        'Moedas: ' +
-                        data.moedas
-                    );
-
-
-                    carregarCodigos();
-
-
-                } catch (error) {
-
-                    console.error(
-                        'Erro ao gerar código:',
-                        error
-                    );
-
-
-                    alert(
-                        error.message
-                    );
-
-
-                } finally {
-
-                    btnGerarCodigo.disabled =
-                        false;
-
-
-                    btnGerarCodigo.innerHTML =
-                        textoOriginal;
-
-                }
-
-            }
-        );
-
-
-
-        /* =====================================================
-           COPIAR CÓDIGO
-           ===================================================== */
-
-        btnCopiarCodigo?.addEventListener(
-            'click',
-            async () => {
-
-                try {
-
-                    await navigator.clipboard.writeText(
-                        codigoGerado.textContent
-                    );
-
-
-                    btnCopiarCodigo.innerHTML =
-                        '<i class="bi bi-check me-1"></i>Copiado!';
-
-
-                    setTimeout(
-                        () => {
-
-                            btnCopiarCodigo.innerHTML =
-                                '<i class="bi bi-copy me-1"></i>Copiar código';
-
-                        },
-                        2000
-                    );
-
-
-                } catch (error) {
-
-                    alert(
-                        'Não foi possível copiar o código.'
-                    );
-
-                }
-
-            }
-        );
-
-
-
-        /* =====================================================
-           CARREGAR CÓDIGOS
-           ===================================================== */
-
-        async function carregarCodigos() {
-
-            try {
-
-                const response =
-                    await fetch(
-                        '/empreendedor/codigos',
-                        {
-
-                            headers: {
-                                'Accept':
-                                    'application/json'
-                            }
-
-                        }
-                    );
-
-
-                if (!response.ok) {
-
-                    return;
-
-                }
-
-
-                const codigos =
-                    await response.json();
-
-
-                if (totalCodigos) {
-
-                    totalCodigos.textContent =
-                        codigos.length;
-
-                }
-
-
-                if (!listaCodigos) {
-
-                    return;
-
-                }
-
-
-                listaCodigos.innerHTML =
-                    '';
-
-
-                if (codigos.length === 0) {
-
-                    listaCodigos.innerHTML = `
-
-                        <div
-                            class="text-center py-4"
-                        >
-
-                            <i
-                                class="bi bi-upc-scan"
-                                style="
-                                    font-size: 2rem;
-                                    color: var(--cinza-300);
-                                "
-                            ></i>
-
-                            <p
-                                class="text-muted mb-0 mt-2"
-                            >
-                                Nenhum código gerado ainda.
-                            </p>
-
-                        </div>
-
-                    `;
-
-                    return;
-
-                }
-
-
-                codigos.forEach(
-                    item => {
-
-                        const data =
-                            new Date(
-                                item.created_at
-                            ).toLocaleString(
-                                'pt-BR'
-                            );
-
-
-                        const moedas =
-                            item.moedas ?? 1;
-
-
-                        const status =
-                            item.status === 'utilizado'
-
-                                ?
-
-                                `
-                                <span
-                                    class="badge bg-secondary"
-                                >
-                                    <i class="bi bi-check2"></i>
-                                    Utilizado
-                                </span>
-                                `
-
-                                :
-
-                                `
-                                <span
-                                    class="badge bg-success"
-                                >
-                                    <i
-                                        class="bi bi-circle-fill"
-                                        style="font-size:.45rem;"
-                                    ></i>
-                                    Disponível
-                                </span>
-                                `;
-
-
-                        listaCodigos.innerHTML += `
-
-                            <div
-                                class="codigo-item
-                                       d-flex
-                                       justify-content-between
-                                       align-items-center"
-                            >
-
-                                <div>
-
-                                    <strong>
-                                        ${item.codigo}
-                                    </strong>
-
-                                    <br>
-
-                                    <span
-                                        class="badge bg-warning text-dark mt-1"
-                                    >
-
-                                        <i
-                                            class="bi bi-coin"
-                                        ></i>
-
-                                        ${moedas}
-
-                                        ${
-                                            moedas == 1
-                                                ? 'moeda'
-                                                : 'moedas'
-                                        }
-
-                                    </span>
-
-                                    <br>
-
-                                    <small
-                                        class="text-muted"
-                                    >
-
-                                        ${data}
-
-                                    </small>
-
-                                </div>
-
-
-                                ${status}
-
-                            </div>
-
-                        `;
-
-                    }
-                );
-
-
-            } catch (error) {
-
-                console.error(
-                    'Erro ao carregar códigos:',
-                    error
-                );
-
-            }
-
+        } catch (error) {
+            console.error('Erro ao sair:', error);
+        } finally {
+            localStorage.removeItem('auth_token');
+            window.location.href = '/login-empreendedor';
         }
+    });
 
-    </script>
+    /* =====================================================
+       ELEMENTOS DA FILA ROTATIVA
+       ===================================================== */
+    const btnAtualizarFila = document.getElementById('btnAtualizarFila');
+    const quantidadeMoedas = document.getElementById('quantidadeMoedas');
+    const codigoGerado = document.getElementById('codigoGerado');
+    const badgeMoedas = document.getElementById('badgeMoedas');
+    const btnCopiarCodigo = document.getElementById('btnCopiarCodigo');
+
+    /* =====================================================
+       ATUALIZAR VALOR DA FILA
+       ===================================================== */
+    btnAtualizarFila?.addEventListener('click', async () => {
+        const textoOriginal = btnAtualizarFila.innerHTML;
+
+        try {
+            const moedas = Number(quantidadeMoedas.value);
+
+            if (!Number.isInteger(moedas) || moedas < 1 || moedas > 10000) {
+                alert('Informe uma quantidade de moedas válida (entre 1 e 10.000).');
+                quantidadeMoedas.focus();
+                return;
+            }
+
+            btnAtualizarFila.disabled = true;
+            btnAtualizarFila.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+
+            const response = await fetch('/empreendedor/fila/atualizar', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({ moedas: moedas })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Erro ao atualizar a fila.');
+            }
+
+            // Atualiza os dados na tela visualmente
+            codigoGerado.textContent = data.codigo;
+            badgeMoedas.innerHTML = `<i class="bi bi-coin"></i> ${data.moedas} moedas`;
+
+            // Feedback de sucesso visual no botão
+            btnAtualizarFila.classList.replace('btn-warning', 'btn-success');
+            btnAtualizarFila.innerHTML = '<i class="bi bi-check-lg"></i> Salvo!';
+            
+            setTimeout(() => {
+                btnAtualizarFila.classList.replace('btn-success', 'btn-warning');
+                btnAtualizarFila.innerHTML = textoOriginal;
+            }, 2000);
+
+        } catch (error) {
+            console.error('Erro ao atualizar fila:', error);
+            alert(error.message);
+            btnAtualizarFila.innerHTML = textoOriginal;
+        } finally {
+            btnAtualizarFila.disabled = false;
+        }
+    });
+
+    /* =====================================================
+       COPIAR CÓDIGO ATUAL
+       ===================================================== */
+    btnCopiarCodigo?.addEventListener('click', async () => {
+        try {
+            await navigator.clipboard.writeText(codigoGerado.textContent);
+            
+            const conteudoAntigo = btnCopiarCodigo.innerHTML;
+            btnCopiarCodigo.innerHTML = '<i class="bi bi-check me-1"></i>Copiado!';
+
+            setTimeout(() => {
+                btnCopiarCodigo.innerHTML = conteudoAntigo;
+            }, 2000);
+        } catch (error) {
+            alert('Não foi possível copiar o código.');
+        }
+    });
+
+</script>
 
 
 </body>

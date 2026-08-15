@@ -7,7 +7,7 @@ use App\Models\Empreendedor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
-
+use Illuminate\Support\Facades\DB;
 
 
 class EmpreendedorController extends Controller
@@ -110,102 +110,118 @@ class EmpreendedorController extends Controller
         ]);
     }
 
-    public function painel(Request $request)
+    public function painel()
     {
-        $empreendedor = Empreendedor::where('user_id', Auth::id())->first();
-
-        if (!$empreendedor) {
-            return redirect('/login-empreendedor')
-                ->with('error', 'Nenhum cadastro de empreendedor encontrado para esta conta.');
+        $user = Auth::user();
+        if (!$user) {
+            return redirect('/login-empreendedor');
         }
 
+        $empreendedor = Empreendedor::where('user_id', $user->id)->first();
+        if (!$empreendedor) {
+            abort(404, 'Empreendedor não encontrado.');
+        }
+
+        // Busca apenas os códigos desta empresa (os usados já terão sido deletados pelo turista)
         $codigos = CodigoTroca::where('empreendedor_id', $empreendedor->id)
-            ->latest()
-            ->get();
+                              ->latest()
+                              ->get();
 
         return view('empreendedor.controleEmpreendedor', [
             'empreendedor' => $empreendedor,
-            'codigos' => $codigos,
+            'codigos' => $codigos
         ]);
     }
 
     public function gerarCodigo(Request $request)
     {
-        $dados = $request->validate([
-            'moedas' => 'required|integer|min:1|max:10000',
+        $request->validate([
+            'moedas' => 'required|integer|min:1'
         ]);
 
-        $empreendedor = Empreendedor::where('user_id', Auth::id())->first();
+        $user = Auth::user();
+        $empreendedor = Empreendedor::where('user_id', $user->id)->first();
 
-        if (!$empreendedor) {
-            return response()->json([
-                'message' => 'Cadastro de empreendedor não encontrado.'
-            ], 404);
-        }
-
-        if ($empreendedor->status !== 'aprovado') {
-            return response()->json([
-                'message' => 'Você só pode gerar códigos depois que seu cadastro for aprovado.'
-            ], 403);
-        }
-
-        do {
-            $codigo = 'RTG-' . strtoupper(Str::random(8));
-        } while (CodigoTroca::where('codigo', $codigo)->exists());
-
-        $codigoTroca = CodigoTroca::create([
-            'empreendedor_id' => $empreendedor->id,
-            'codigo' => $codigo,
-            'moedas' => $dados['moedas'],
-            'status' => 'disponivel',
-        ]);
+        // Cria o cupom descartável no banco
+        $novoCupom = new CodigoTroca();
+        $novoCupom->empreendedor_id = $empreendedor->id;
+        $novoCupom->codigo = 'RTG-' . strtoupper(Str::random(6)); 
+        $novoCupom->moedas = $request->moedas;
+        $novoCupom->status = 'disponivel'; 
+        $novoCupom->save();
 
         return response()->json([
             'message' => 'Código gerado com sucesso!',
-            'codigo' => $codigoTroca->codigo,
-            'moedas' => $codigoTroca->moedas,
-        ], 201);
-    }
-
-    public function listarCodigos(Request $request)
-    {
-        $empreendedor = Empreendedor::where('user_id', Auth::id())->firstOrFail();
-
-        return response()->json(
-            CodigoTroca::where('empreendedor_id', $empreendedor->id)
-                ->latest()
-                ->get()
-        );
-    }
-
-    public function usarCodigo(Request $request)
-    {
-        $request->validate([
-            'codigo' => 'required|string|max:12',
+            'codigo' => $novoCupom->codigo,
+            'moedas' => $novoCupom->moedas
         ]);
+    }
 
-        $codigo = CodigoTroca::where('codigo', strtoupper(trim($request->codigo)))
-            ->where('status', 'disponivel')
-            ->first();
+    public function listarCodigos()
+    {
+        $user = Auth::user();
+        $empreendedor = Empreendedor::where('user_id', $user->id)->first();
+        
+        $codigos = CodigoTroca::where('empreendedor_id', $empreendedor->id)
+                              ->latest()
+                              ->get();
+                              
+        return response()->json($codigos);
+    }
 
-        if (!$codigo) {
-            return response()->json([
-                'message' => 'Código inválido ou já utilizado.'
-            ], 422);
+   public function usarCodigo(Request $request)
+{
+    $request->validate(['codigo' => 'required|string']);
+    $user = Auth::user();
+
+    if (!$user) {
+        return response()->json(['message' => 'Você precisa estar logado.'], 401);
+    }
+
+    $codigoDigitado = strtoupper(trim($request->codigo));
+
+    DB::beginTransaction();
+    try {
+        // 1. Busca o código que o turista digitou
+        $cupom = CodigoTroca::where('codigo', $codigoDigitado)->lockForUpdate()->first();
+
+        if (!$cupom) {
+            DB::rollBack();
+            return response()->json(['message' => 'Código inválido ou já resgatado.'], 400);
         }
 
-        $codigo->update([
-            'status' => 'utilizado',
-            'user_id' => Auth::id(),
-            'utilizado_em' => now(),
-        ]);
+        // 2. Guarda os dados antes de queimar o código
+        $moedasGanhas = $cupom->moedas;
+        $empreendedorId = $cupom->empreendedor_id;
+
+        // 3. Atualiza o saldo do turista
+        $novoSaldo = (int) ($user->moedas ?? 0) + (int) $moedasGanhas;
+        DB::table('users')->where('id', $user->id)->update(['moedas' => $novoSaldo]);
+
+        // 4. QUEIMA O CÓDIGO ATUAL
+        $cupom->delete();
+
+        // 5. GERA AUTOMATICAMENTE O PRÓXIMO DA FILA COM O MESMO VALOR
+        $proximoCupom = new CodigoTroca();
+        $proximoCupom->empreendedor_id = $empreendedorId;
+        $proximoCupom->codigo = 'RTG-' . strtoupper(Str::random(6));
+        $proximoCupom->moedas = $moedasGanhas;
+        $proximoCupom->status = 'disponivel';
+        $proximoCupom->save();
+
+        DB::commit();
 
         return response()->json([
-            'message' => 'Código utilizado com sucesso!',
-            'codigo' => $codigo->codigo,
-            'empreendedor_id' => $codigo->empreendedor_id,
+            'message' => 'Resgate realizado com sucesso!',
+            'moedas_ganhas' => $moedasGanhas,
+            'saldo_atual' => $novoSaldo
         ]);
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return response()->json(['message' => 'Erro ao resgatar.', 'error' => $e->getMessage()], 500);
     }
+}
 
     public function salvarCupomUnico(Request $request)
 {
@@ -252,4 +268,37 @@ class EmpreendedorController extends Controller
 
         return response()->json(['message' => 'Empreendedor removido.']);
     }
+
+    public function atualizarValorFila(Request $request)
+{
+    $request->validate(['moedas' => 'required|integer|min:1']);
+
+    $user = Auth::user();
+    $empreendedor = \App\Models\Empreendedor::where('user_id', $user->id)->first();
+
+    // CORREÇÃO AQUI: Adicionamos o ->latest() para pegar o mesmo da tela!
+    $cupomFila = CodigoTroca::where('empreendedor_id', $empreendedor->id)
+                            ->latest()
+                            ->first();
+
+    // Se a fila já existir, apenas atualiza o valor
+    if ($cupomFila) {
+        $cupomFila->moedas = $request->moedas;
+        $cupomFila->save();
+    } else {
+        // Se a fila estiver vazia (primeiro acesso do empreendedor), cria o primeiro código
+        $cupomFila = new CodigoTroca();
+        $cupomFila->empreendedor_id = $empreendedor->id;
+        $cupomFila->codigo = 'RTG-' . strtoupper(Str::random(6));
+        $cupomFila->moedas = $request->moedas;
+        $cupomFila->status = 'disponivel';
+        $cupomFila->save();
+    }
+
+    return response()->json([
+        'message' => 'Valor da fila atualizado!',
+        'codigo' => $cupomFila->codigo,
+        'moedas' => $cupomFila->moedas
+    ]);
+}
 }

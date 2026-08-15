@@ -127,7 +127,7 @@
 
                         <span>Saldo atual</span>
 
-                        <strong id="coinsValue">25</strong>
+                        <strong id="coinsValue">{{ auth()->check() ? (auth()->user()->moedas ?? 0) : 0 }}</strong>
 
                         <small>moedas</small>
 
@@ -263,6 +263,73 @@
         </section>
 
     </main>
+    <!-- SCRIPT DE RESGATE DE CÓDIGOS ROTAGUIADA -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const codeForm = document.getElementById('codeForm');
+            const codeInput = document.getElementById('codeInput');
+            const coinsValue = document.getElementById('coinsValue');
+            const codeMessage = document.getElementById('codeMessage');
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+            codeForm?.addEventListener('submit', async (e) => {
+                e.preventDefault(); // Evita que a página recarregue ao apertar Enter/Resgatar
+                
+                const codigo = codeInput.value.trim().toUpperCase();
+                const btnSubmit = codeForm.querySelector('button[type="submit"]');
+                const textoOriginal = btnSubmit.innerHTML;
+
+                if (codigo.length < 5) return;
+
+                try {
+                    // Estado de carregamento
+                    btnSubmit.disabled = true;
+                    btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+                    codeMessage.innerHTML = ''; // Limpa mensagens de erro antigas
+
+                    const response = await fetch('/usuario/codigos/usar', {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken
+                        },
+                        body: JSON.stringify({ codigo: codigo })
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(data.message || 'Código inválido ou já utilizado.');
+                    }
+
+                    // Sucesso! Atualiza o número de moedas na tela
+                    coinsValue.textContent = data.saldo_atual;
+                    
+                    // Mostra mensagem verde de sucesso
+                    codeInput.value = '';
+                    codeMessage.innerHTML = `<div style="color: #28a745; margin-top: 10px; font-weight: bold; text-align: center;">
+                        <i class="fa-solid fa-check-circle"></i> +${data.moedas_ganhas} moedas!
+                    </div>`;
+                    
+                    // Apaga a mensagem depois de 4 segundos
+                    setTimeout(() => {
+                        codeMessage.innerHTML = '';
+                    }, 4000);
+
+                } catch (error) {
+                    // Mostra mensagem vermelha de erro
+                    codeMessage.innerHTML = `<div style="color: #dc3545; margin-top: 10px; font-weight: bold; text-align: center;">
+                        <i class="fa-solid fa-circle-exclamation"></i> ${error.message}
+                    </div>`;
+                } finally {
+                    // Devolve o botão ao estado normal
+                    btnSubmit.disabled = false;
+                    btnSubmit.innerHTML = textoOriginal;
+                }
+            });
+        });
+    </script>
 
 </body>
 
