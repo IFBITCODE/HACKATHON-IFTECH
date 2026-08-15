@@ -72,16 +72,16 @@
                     <h6 class="text-muted mb-3">Indicadores do mês</h6>
 
                     <div class="d-flex justify-content-between mb-2">
-                        <span class="label">Acessos totais</span>
-                        <span class="value">{{ number_format($data['kpis']['accesses']['value'], 0, ',', '.') }}</span>
+                        <span class="label">Empreendedores aprovados</span>
+                        <span class="value">{{ number_format($data['empreendedores']['aprovados']['value'], 0, ',', '.') }}</span>
                     </div>
                     <div class="d-flex justify-content-between mb-2">
-                        <span class="label">Visitantes únicos</span>
-                        <span class="value">{{ number_format($data['kpis']['unique_visitors']['value'], 0, ',', '.') }}</span>
-                    </div>
-                    <div class="d-flex justify-content-between">
                         <span class="label">Turistas registrados</span>
                         <span class="value">{{ number_format($data['usuarios']['turistas']['value'], 0, ',', '.') }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="label">Empreendedores pendentes</span>
+                        <span class="value">{{ number_format($data['empreendedores']['pendentes']['value'], 0, ',', '.') }}</span>
                     </div>
                 </div>
             </div>
